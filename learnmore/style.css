@@ -6,77 +6,88 @@ body {
   color: #222;
 }
 
+/* Header */
 .team-header {
   text-align: center;
-  background-color: #f0f4f8;
-  padding: 40px 20px;
-  border-bottom: 1px solid #ddd;
+  background-color: #006d77;
+  padding: 50px 20px;
+  border-bottom: 4px solid #bbcf32;
 }
 
 .team-header h1 {
-  font-size: 32px;
-  color: #006d77;
+  font-size: 36px;
+  color: #ffffff;
   margin-bottom: 10px;
 }
 
 .team-header p {
   font-size: 18px;
-  color: #444;
+  color: #e0f7f5;
+  margin-top: 0;
 }
 
+/* Grid Layout */
 .learnmore-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 40px 20px;
+  gap: 24px;
+  padding: 50px 20px;
   max-width: 1000px;
   margin: auto;
 }
 
+/* Grid Items */
 .learnmore-box {
-  background-color: #f5f7fb;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+  background-color: #e0f4f3;
+  border: 1px solid #bbcf32;
+  border-radius: 14px;
   padding: 30px 20px;
   font-size: 18px;
   font-weight: 600;
   text-align: center;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .learnmore-box:hover {
   transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .learnmore-box a {
   color: #006d77;
   text-decoration: none;
   display: inline-block;
+  transition: color 0.3s ease;
 }
 
 .learnmore-box a:hover {
+  color: #dd8545;
   text-decoration: underline;
 }
 
+/* Back Button */
 .back-button {
-  padding: 10px 24px;
+  padding: 12px 26px;
   background-color: #006d77;
   color: #fff;
   text-decoration: none;
   font-weight: 600;
   border-radius: 30px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
   display: inline-block;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .back-button:hover {
-  background-color: #004f57;
+  background-color: #dd8545;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
+/* Footer */
 .team-footer {
   text-align: center;
-  padding: 24px 10px;
+  padding: 30px 10px;
   background-color: #f8f9fa;
   font-size: 14px;
   color: #888;
