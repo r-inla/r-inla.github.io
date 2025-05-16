@@ -13,7 +13,7 @@ output:
 
 ## 📘 Example Description
 
-This example demonstrates how to fit a **Poisson generalized linear model (GLM)** using the `INLA` package in R.  
+This example demonstrates how to fit a **Poooooooooooooooooooooooooooooooooooooooooooooisson generalized linear model (GLM)** using the `INLA` package in R.  
 We simulate a small dataset with one covariate and analyze the posterior distribution of the regression coefficients.
 
 - **Goal:** Demonstrate basic INLA syntax and workflow  
