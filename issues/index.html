@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Local Issue Reporter</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create an INLA Issue</title>
+  <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Submit a Local Issue</h1>
-    <p>Write your message, add attachments, and save it like an email locally.</p>
+    <h1>Create an INLA Issue</h1>
+    <p>Submit a question, report a bug, or share a suggestion. Files and code welcome.</p>
   </header>
 
   <main>
-    <form id="localIssueForm">
-      <label for="message">Your Message:</label>
-      <textarea id="message" rows="10" placeholder="Describe the issue, include code, etc."></textarea>
+    <form id="issueForm">
+      <label for="title">Issue Title</label>
+      <input type="text" id="title" required placeholder="Short summary">
 
-      <label for="files">Attach Files:</label>
-      <input type="file" id="files" multiple>
+      <label for="description">Description / Message</label>
+      <textarea id="description" rows="8" required placeholder="Details, code snippets, ideas..."></textarea>
 
-      <button type="submit">Save Locally as ZIP</button>
+      <label for="attachments">Attach files (optional)</label>
+      <input type="file" id="attachments" multiple>
+
+      <button type="submit">Download & Submit Later</button>
     </form>
 
     <div id="response"></div>
   </main>
 
   <footer>
-    <p>This works completely offline on your machine. No data is sent anywhere.</p>
+    <p>This form helps you prepare an issue for the INLA GitHub repo.</p>
   </footer>
 
   <script>
-    document.getElementById('localIssueForm').addEventListener('submit', async function (e) {
+    document.getElementById('issueForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      const message = document.getElementById('message').value.trim();
-      const files = document.getElementById('files').files;
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const files = document.getElementById('attachments').files;
 
       const zip = new JSZip();
-      zip.file('message.txt', message || '(No message)');
+      zip.file('issue_title.txt', title);
+      zip.file('description.txt', description);
 
       for (let file of files) {
         const content = await file.arrayBuffer();
@@ -49,10 +55,10 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'issue_report.zip';
+        a.download = title.replace(/\s+/g, '_') + '_inla_issue.zip';
         a.click();
 
-        document.getElementById('response').innerText = '✅ Issue saved as ZIP file.';
+        document.getElementById('response').innerText = '✅ Issue packaged as ZIP file. You can email or upload it.';
       });
     });
   </script>

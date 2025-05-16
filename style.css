@@ -1,3 +1,4 @@
+/* === BASE === */
 body {
   font-family: 'Inter', sans-serif;
   background-color: #ffffff;
@@ -12,6 +13,7 @@ body {
   margin-left: 240px;
 }
 
+/* === HEADER === */
 header {
   text-align: center;
   padding: 40px 20px 0;
@@ -25,28 +27,33 @@ header {
 }
 
 .logo-wrapper {
-  margin-top: 10px;
+  margin-top: 30px;
 }
 
 .logo-wrapper img {
   width: 260px;
 }
 
+/* === INTRO BOX === */
 .intro-box {
-  background-color: #f0f4f8;
+  background-color: #006d77; /* or another dark background */
+  border-left: 6px solid #bbcf32;
   margin: 30px auto;
   max-width: 800px;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   text-align: center;
 }
 
 .intro-box p {
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 19px;
+  color: #ffffff; /* ✅ this sets the paragraph text to white */
+  line-height: 1.7;
 }
 
+
+/* === NAVIGATION === */
 nav {
   text-align: center;
   margin-top: 30px;
@@ -57,8 +64,14 @@ nav a {
   text-decoration: none;
   color: #006d77;
   font-weight: 600;
+  transition: border-bottom 0.2s ease;
 }
 
+nav a:hover {
+  border-bottom: 2px solid #bbcf32;
+}
+
+/* === GRID BUTTONS === */
 .buttons-grid {
   display: flex;
   flex-wrap: wrap;
@@ -75,7 +88,8 @@ nav a {
   background-color: #ffffff;
   border-radius: 14px;
   text-align: center;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+  border-top: 4px solid #bbcf32;
   transition: transform 0.2s ease;
 }
 
@@ -109,6 +123,7 @@ nav a {
   font-size: 15px;
 }
 
+/* === SIDE BUTTONS === */
 .side-buttons {
   display: flex;
   flex-direction: column;
@@ -126,8 +141,9 @@ nav a {
   font-weight: 600;
 }
 
+/* === FOOTER === */
 .contact-footer {
-  background-color: #f0f4f8;
+  background-color: #f7f7f7;
   text-align: center;
   padding: 40px 20px;
   margin-top: 40px;
@@ -161,6 +177,7 @@ nav a {
   background-color: #004f57;
 }
 
+/* === RESPONSIVE === */
 @media (max-width: 850px) {
   .button-box {
     width: 45%;
@@ -173,6 +190,7 @@ nav a {
   }
 }
 
+/* === SIDEBAR === */
 .sidebar {
   position: fixed;
   top: 0;
@@ -190,16 +208,19 @@ nav a {
   width: 220px;
 }
 
-.sidebar::before {
-  content: "☰";
-  position: absolute;
-  top: 20px;
-  left: 10px;
-  font-size: 20px;
-  color: #ffffff;
-  opacity: 0.5;
-  transition: opacity 0.2s;
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100vh;
+  background-color: #1c1c1c;
+  z-index: 1000;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
+
 
 .sidebar:hover::before {
   opacity: 0;
@@ -233,8 +254,16 @@ nav a {
   padding-left: 10px;
 }
 
-
 .sidebar ul li a:hover {
   color: #bbcf32;
+}
+
+.main-content-wrapper {
+  transition: margin-left 0.3s ease;
+}
+
+/* Shift logo + icons together when sidebar expands */
+.sidebar:hover ~ .main-content-wrapper {
+  margin-left: 220px;
 }
 

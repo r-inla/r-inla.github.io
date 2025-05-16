@@ -1,6 +1,6 @@
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #ffffff;
+  background-color: #fff;
   margin: 0;
   padding: 0;
   color: #222;
@@ -14,13 +14,13 @@ header {
 }
 
 header h1 {
-  font-size: 32px;
+  font-size: 28px;
   color: #006d77;
   margin-bottom: 10px;
 }
 
 header p {
-  font-size: 18px;
+  font-size: 16px;
   color: #444;
 }
 
@@ -34,40 +34,37 @@ form {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background-color: #f5f7fb;
+  background: #f9fafa;
   padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  border: 1px solid #ddd;
+  border-radius: 10px;
+  border: 1px solid #ccc;
 }
 
 label {
-  font-size: 16px;
   font-weight: 600;
   color: #006d77;
 }
 
+input[type="text"],
 textarea,
-input[type=\"file\"] {
+input[type="file"] {
   padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
+  font-size: 15px;
   border-radius: 6px;
-  background-color: #fff;
-  color: #333;
+  border: 1px solid #bbb;
   width: 100%;
   box-sizing: border-box;
 }
 
 button {
-  padding: 12px 24px;
+  padding: 12px;
   background-color: #006d77;
   color: #fff;
   font-weight: 600;
   border: none;
   border-radius: 30px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 button:hover {
@@ -76,17 +73,15 @@ button:hover {
 
 #response {
   margin-top: 20px;
-  text-align: center;
   font-size: 16px;
+  text-align: center;
   color: #444;
 }
 
 footer {
   text-align: center;
-  padding: 24px 10px;
-  background-color: #f8f9fa;
-  font-size: 14px;
-  color: #888;
-  border-top: 1px solid #eee;
+  padding: 20px;
+  font-size: 13px;
+  color: #aaa;
 }
 
