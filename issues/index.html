@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Issue Reporter</title>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Submit a Local Issue</h1>
+    <p>Write your message, add attachments, and save it like an email locally.</p>
+  </header>
+
+  <main>
+    <form id="localIssueForm">
+      <label for="message">Your Message:</label>
+      <textarea id="message" rows="10" placeholder="Describe the issue, include code, etc."></textarea>
+
+      <label for="files">Attach Files:</label>
+      <input type="file" id="files" multiple>
+
+      <button type="submit">Save Locally as ZIP</button>
+    </form>
+
+    <div id="response"></div>
+  </main>
+
+  <footer>
+    <p>This works completely offline on your machine. No data is sent anywhere.</p>
+  </footer>
+
+  <script>
+    document.getElementById('localIssueForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const message = document.getElementById('message').value.trim();
+      const files = document.getElementById('files').files;
+
+      const zip = new JSZip();
+      zip.file('message.txt', message || '(No message)');
+
+      for (let file of files) {
+        const content = await file.arrayBuffer();
+        zip.file(file.name, content);
+      }
+
+      zip.generateAsync({ type: 'blob' }).then(function (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'issue_report.zip';
+        a.click();
+
+        document.getElementById('response').innerText = '✅ Issue saved as ZIP file.';
+      });
+    });
+  </script>
+</body>
+</html>
+

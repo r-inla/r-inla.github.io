@@ -1,0 +1,85 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+.team-header {
+  text-align: center;
+  background-color: #f0f4f8;
+  padding: 40px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.team-header h1 {
+  font-size: 32px;
+  color: #006d77;
+  margin-bottom: 10px;
+}
+
+.team-header p {
+  font-size: 18px;
+  color: #444;
+}
+
+.learnmore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.learnmore-box {
+  background-color: #f5f7fb;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 30px 20px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  transition: transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.learnmore-box:hover {
+  transform: translateY(-5px);
+}
+
+.learnmore-box a {
+  color: #006d77;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.learnmore-box a:hover {
+  text-decoration: underline;
+}
+
+.back-button {
+  padding: 10px 24px;
+  background-color: #006d77;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+}
+
+.back-button:hover {
+  background-color: #004f57;
+}
+
+.team-footer {
+  text-align: center;
+  padding: 24px 10px;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  color: #888;
+  border-top: 1px solid #eee;
+}
+

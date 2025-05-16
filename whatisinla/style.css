@@ -1,0 +1,73 @@
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #222;
+  background-color: #fff;
+}
+
+.team-header {
+  background-color: #f0f4f8;
+  text-align: center;
+  padding: 40px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.team-header h1 {
+  font-size: 32px;
+  color: #006d77;
+  margin-bottom: 10px;
+}
+
+.team-header p {
+  font-size: 18px;
+  color: #444;
+}
+
+.content-section {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.content-section p {
+  margin-bottom: 20px;
+}
+
+.resource-links a {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #006d77;
+  text-decoration: none;
+}
+
+.resource-links a:hover {
+  text-decoration: underline;
+}
+
+.team-footer {
+  text-align: center;
+  padding: 30px 10px;
+  font-size: 14px;
+  color: #999;
+  background-color: #f8f9fa;
+  border-top: 1px solid #eee;
+}
+
+.back-button {
+  padding: 10px 20px;
+  background-color: #006d77;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 25px;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #004f57;
+}
+

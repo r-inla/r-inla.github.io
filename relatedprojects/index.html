@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Related Projects – INLA Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="team-header">
+    <h1>Related Projects</h1>
+    <p>Other packages and frameworks built around or using INLA methodology</p>
+  </header>
+
+  <section class="projects-grid">
+    <div class="project-box">
+      <a href="https://github.com/becarioprecario/INLAMSM" target="_blank">INLAMSM</a>
+    </div>
+    <div class="project-box">
+      <a href="https://cran.r-project.org/web/packages/INLABMA/INLABMA.pdf" target="_blank">INLABMA</a>
+    </div>
+    <div class="project-box">
+      <a href="https://github.com/becarioprecario/MIINLA" target="_blank">MIINLA</a>
+    </div>
+    <div class="project-box">
+      <a href="https://inlabru-org.github.io/inlabru/" target="_blank">inlabru</a>
+    </div>
+    <div class="project-box">
+      <a href="https://github.com/davidbolin/excursions/tree/devel" target="_blank">excursions</a>
+    </div>
+    <div class="project-box">
+      <a href="https://lisa-gm.github.io/INLA_DIST/documentation/html/index.html" target="_blank">INLA_DIST</a>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <h2>Packages on CRAN Suggesting or Depending on INLA</h2>
+    <p>The following R code identifies CRAN packages that suggest or depend on INLA using the <code>library("cranly")</code> package:</p>
+    <code>
+my.cran.inla <- function() {
+    library("cranly")
+    library("tools")
+    p = clean_CRAN_db(CRAN_package_db())
+    m = length(p$package)
+    idx.s = which(unlist(lapply(1:m, function(ii) any(p$suggests[[ii]] %in% "INLA"))))
+    idx.d = which(unlist(lapply(1:m, function(ii) any(p$depends[[ii]] %in% "INLA"))))
+    return(list(suggests = p$package[idx.s], depends = p$package[idx.d]))
+}
+
+my.cran.inla()
+
+## $suggests
+##  [1] "abn"           "AGPRIS"        "BATSS"         "BayesfMRI"     "bigDM"         
+##  [6] "bmstdr"        "CRTspat"       "DClusterm"     "eCAR"          "excursions"    
+## [11] "highriskzone"  "INLABMA"       "inlabru"       "INLAjoint"     "inlamemi"      
+## [16] "INLAspacetime" "makemyprior"   "meta4diag"     "MetricGraph"   "nmaINLA"       
+## [21] "phyr"          "PointedSDMs"   "PrevMap"       "rSPDE"         "SimSurvey"     
+## [26] "SpatGC"        "SpatialGEV"    "SUMMER"        "surveillance"  "surveyPrev"    
+## [31] "survHE"        "templateICAr"  "voi"           
+##
+## $depends
+## character(0)
+    </code>
+  </section>
+
+  <div style="text-align: center; margin: 50px 0;">
+    <a href="../index.html" class="back-button">← Back to Home</a>
+  </div>
+
+  <footer class="team-footer">
+    <p>&copy; 2025 INLA Project</p>
+  </footer>
+</body>
+</html>
+

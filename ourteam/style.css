@@ -1,0 +1,93 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+.team-header {
+  text-align: center;
+  background-color: #f0f4f8;
+  padding: 40px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.team-header h1 {
+  font-size: 32px;
+  color: #006d77;
+  margin-bottom: 10px;
+}
+
+.team-header p {
+  font-size: 18px;
+  color: #444;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.team-member {
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.team-member:hover {
+  transform: translateY(-5px);
+}
+
+.team-member img {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: contain;
+  background-color: #fff;
+  padding: 5px;
+  margin-bottom: 15px;
+}
+
+
+.team-member h3 {
+  font-size: 18px;
+  color: #006d77;
+  margin: 10px 0 4px;
+}
+
+.team-member p {
+  font-size: 15px;
+  color: #555;
+}
+
+.team-footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  color: #888;
+  border-top: 1px solid #eee;
+}
+
+.back-button {
+  padding: 10px 20px;
+  background-color: #006d77;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 25px;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #004f57;
+}
+
