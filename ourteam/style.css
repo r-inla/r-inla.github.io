@@ -6,88 +6,100 @@ body {
   color: #222;
 }
 
+/* Header */
 .team-header {
   text-align: center;
-  background-color: #f0f4f8;
-  padding: 40px 20px;
-  border-bottom: 1px solid #ddd;
+  background-color: #006d77;
+  padding: 50px 20px;
+  border-bottom: 4px solid #bbcf32;
 }
 
 .team-header h1 {
-  font-size: 32px;
-  color: #006d77;
+  font-size: 36px;
+  color: #ffffff;
   margin-bottom: 10px;
 }
 
 .team-header p {
   font-size: 18px;
-  color: #444;
+  color: #e0f7f5;
+  margin-top: 0;
 }
 
+/* Team Grid */
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 30px;
-  padding: 40px 20px;
-  max-width: 1000px;
+  padding: 50px 20px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
+/* Individual Profile Cards */
 .team-member {
-  background-color: #fafafa;
-  border-radius: 12px;
+  background-color: #e0f4f3;
+  border: 1px solid #bbcf32;
+  border-radius: 16px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.05);
-  padding: 20px;
+  padding: 30px 20px;
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .team-member:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
 }
 
 .team-member img {
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  object-fit: contain;
+  object-fit: cover;
   background-color: #fff;
-  padding: 5px;
-  margin-bottom: 15px;
+  padding: 6px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-
 .team-member h3 {
-  font-size: 18px;
+  font-size: 20px;
   color: #006d77;
-  margin: 10px 0 4px;
+  margin: 10px 0 6px;
 }
 
 .team-member p {
   font-size: 15px;
-  color: #555;
+  color: #444;
+  line-height: 1.5;
 }
 
-.team-footer {
-  text-align: center;
-  padding: 20px;
-  background-color: #f8f9fa;
-  font-size: 14px;
-  color: #888;
-  border-top: 1px solid #eee;
-}
-
+/* Back to Home Button */
 .back-button {
-  padding: 10px 20px;
+  padding: 12px 26px;
   background-color: #006d77;
   color: #fff;
   text-decoration: none;
   font-weight: 600;
-  border-radius: 25px;
-  transition: background-color 0.3s ease;
+  border-radius: 30px;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  display: inline-block;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .back-button:hover {
-  background-color: #004f57;
+  background-color: #dd8545;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Footer */
+.team-footer {
+  text-align: center;
+  padding: 30px 10px;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  color: #888;
+  border-top: 1px solid #eee;
 }
 
