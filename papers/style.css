@@ -6,24 +6,27 @@ body {
   color: #222;
 }
 
+/* Header */
 .team-header {
   text-align: center;
-  background-color: #f0f4f8;
-  padding: 40px 20px;
-  border-bottom: 1px solid #ddd;
+  background-color: #006d77;
+  padding: 50px 20px;
+  border-bottom: 4px solid #bbcf32;
 }
 
 .team-header h1 {
-  font-size: 32px;
-  color: #006d77;
+  font-size: 36px;
+  color: #ffffff;
   margin-bottom: 10px;
 }
 
 .team-header p {
   font-size: 18px;
-  color: #444;
+  color: #e0f7f5;
+  margin-top: 0;
 }
 
+/* Content Area */
 .content-section {
   max-width: 1000px;
   margin: 40px auto;
@@ -32,57 +35,112 @@ body {
   line-height: 1.75;
 }
 
-.content-section h2 {
-  color: #006d77;
-  font-size: 22px;
-  margin-bottom: 12px;
-}
-
+/* Collapsible Sections - Primary */
 details {
   margin-bottom: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px 16px;
-  background-color: #f9fafa;
+  border: 1px solid #bbcf32;
+  border-radius: 10px;
+  padding: 12px 18px;
+  background-color: #e0f4f3;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
 }
 
+/* Collapsible Sections - Nested */
+details details {
+  background-color: #e0f4f3;
+  margin-top: 12px;
+  margin-left: 16px;
+  border-left: 3px solid #bbcf32;
+  padding-left: 16px;
+  padding-right: 0;
+}
+
+/* Summary Title Styles */
 summary {
   font-weight: 600;
   cursor: pointer;
   font-size: 18px;
+  color: #006d77;
+  list-style: none;
+  outline: none;
+  position: relative;
+  padding-left: 1.2em;
 }
 
+/* Restore Arrows */
+summary::before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(2px);
+  font-size: 14px;
+  color: #006d77;
+  transition: transform 0.2s ease;
+}
+
+details[open] > summary::before {
+  content: "▼";
+  transform: translateY(2px);
+}
+
+/* Subcategory Summary */
+details details summary {
+  font-size: 16px;
+  color: #006d77;
+  padding-left: 1.2em;
+}
+
+details details summary::before {
+  font-size: 12px;
+}
+
+/* Paper List */
 ul.paper-list {
   margin: 10px 0 0 20px;
   padding: 0;
 }
 
 ul.paper-list li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-.back-button {
-  display: inline-block;
-  margin-top: 20px;
-  font-size: 16px;
+ul.paper-list li a {
   color: #006d77;
   text-decoration: none;
-  border: 1px solid #006d77;
-  padding: 6px 12px;
-  border-radius: 4px;
+  font-weight: 500;
+}
+
+ul.paper-list li a:hover {
+  color: #dd8545;
+  text-decoration: underline;
+}
+
+/* Back Button */
+.back-button {
+  display: inline-block;
+  padding: 12px 26px;
+  background-color: #006d77;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .back-button:hover {
-  background-color: #006d77;
-  color: #fff;
+  background-color: #dd8545;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
+/* Footer */
 .team-footer {
   text-align: center;
-  padding: 30px;
-  border-top: 1px solid #ddd;
-  margin-top: 40px;
+  padding: 30px 10px;
+  background-color: #f8f9fa;
   font-size: 14px;
-  color: #666;
+  color: #888;
+  border-top: 1px solid #eee;
 }
 

@@ -1,0 +1,142 @@
+---
+title: "INLA Example: Poisson GLM with One Covariate"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    highlight: tango
+---
+
+## 📘 Example Description
+
+This example demonstrates how to fit a **Poisson generalized linear model (GLM)** using the `INLA` package in R.  
+We simulate a small dataset with one covariate and analyze the posterior distribution of the regression coefficients.
+
+- **Goal:** Demonstrate basic INLA syntax and workflow  
+- **Model type:** Fixed-effect Poisson regression  
+- **Tags:** `GLM`, `Poisson`, `Bayesian`, `INLA`, `Regression`
+
+---
+
+## 📊 Data Description
+
+We generate Poisson count data with one covariate \(x\):
+
+\[
+\eta = \beta_0 + \beta_1 x, \quad y \sim \text{Poisson}(\mu), \quad \mu = e^\eta
+\]
+
+```r
+# Simulate data
+set.seed(123)
+n   <- 100
+x   <- rnorm(n)
+eta <- 1 + 0.5 * x
+mu  <- exp(eta)
+y   <- rpois(n, mu)
+
+data <- data.frame(y = y, x = x)
+head(data)
+```
+
+---
+
+## 📐 Model Specification and Fitting
+
+We fit a Poisson regression model using `inla()` with the formula `y ~ x`:
+
+```r
+# Load INLA
+library(INLA)
+
+# Define the model
+formula <- y ~ x
+
+# Fit the model
+result <- inla(formula, family = "poisson", data = data)
+```
+
+---
+
+## 📈 Posterior Results and Summary
+
+We summarize the fixed effects and visualize the posterior means.
+
+```r
+# Summary of fixed effects
+result$summary.fixed
+```
+
+```r
+# Plot posterior means
+plot(result$summary.fixed$mean, type = "b", pch = 19,
+     col = "steelblue",
+     main = "Posterior Means of Coefficients",
+     ylab = "Posterior Mean", xlab = "Coefficient")
+axis(1, at = 1:2, labels = rownames(result$summary.fixed))
+```
+
+```r
+# Posterior means with 95% credible intervals
+result$summary.fixed[, c("mean", "0.025quant", "0.975quant")]
+```
+
+---
+
+## 🧠 Interpretation of Results
+
+- **Intercept (β₀)** ≈ 1, matching the true value.  
+- **Slope (β₁)** ≈ 0.5, matching the simulated value.  
+- The 95% credible interval for β₁ excludes 0 → strong evidence of a positive effect of \(x\) on \(y\).
+
+---
+
+## 📊 Observed vs. Fitted Values
+
+We now compare observed versus fitted values:
+
+```r
+# Add fitted values to data
+data$fitted <- result$summary.fitted.values$mean
+
+# Plot
+plot(data$y, data$fitted, pch = 19, col = "darkgreen",
+     xlab = "Observed y", ylab = "Fitted values",
+     main = "Observed vs Fitted")
+abline(0, 1, col = "red", lty = 2)
+```
+
+---
+
+## 📝 Comments and Extensions
+
+This is a minimal INLA example. You can extend it to:
+
+- Add **random effects**, e.g. `f(id, model = "iid")`
+- Use different **likelihoods**, e.g. `binomial`, `nbinomial`, `gaussian`
+- Fit **real-world models**, e.g. spatial data, repeated measures, or count data in epidemiology
+
+Example with random intercepts:
+
+```r
+# Simulate groups
+data$id <- rep(1:20, each = 5)
+
+# Add random intercepts
+result2 <- inla(y ~ x + f(id, model = "iid"),
+                family = "poisson", data = data)
+
+summary(result2)
+```
+
+---
+
+## 📎 References
+
+- Rue, H., Martino, S., & Chopin, N. (2009).  
+  *Approximate Bayesian inference for latent Gaussian models using integrated nested Laplace approximations (INLA).* JRSS-B.  
+- INLA Project: [https://www.r-inla.org](https://www.r-inla.org)

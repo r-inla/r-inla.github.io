@@ -1,0 +1,93 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+/* Header */
+.team-header {
+  text-align: center;
+  background-color: #006d77;
+  padding: 50px 20px;
+  border-bottom: 4px solid #bbcf32;
+}
+
+.team-header h1 {
+  font-size: 36px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.team-header p {
+  font-size: 18px;
+  color: #e0f7f5;
+  margin-top: 0;
+}
+
+/* Tutorial Section */
+.tutorial-section {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.tutorial-section h2 {
+  color: #006d77;
+  font-size: 22px;
+  margin-bottom: 16px;
+  border-left: 5px solid #bbcf32;
+  padding-left: 12px;
+}
+
+.tutorial-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tutorial-list li {
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.tutorial-list a {
+  color: #006d77;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.tutorial-list a:hover {
+  color: #dd8545;
+  text-decoration: underline;
+}
+
+/* Back Button */
+.back-button {
+  padding: 12px 26px;
+  background-color: #006d77;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  display: inline-block;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.back-button:hover {
+  background-color: #dd8545;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Footer */
+.team-footer {
+  text-align: center;
+  padding: 30px 10px;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  color: #888;
+  border-top: 1px solid #eee;
+}
+
