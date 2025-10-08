@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INLA Book Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="team-header">
+    <h1>📚 INLA Book Viewer</h1>
+    <p>Click a book title to preview its cover and link</p>
+  </header>
+
+  <section class="book-selector">
+    <ul class="book-list">
+      <li onclick="showBook(1)">Bayesian Inference with INLA</li>
+      <li onclick="showBook(2)">Spatial Modeling using INLA</li>
+      <li onclick="showBook(3)">Advanced Topics in INLA</li>
+      <li onclick="showBook(4)">INLA for Spatio-Temporal Models</li>
+      <li onclick="showBook(5)">Hierarchical Bayesian Models</li>
+      <li onclick="showBook(6)">INLA Cookbook</li>
+      <li onclick="showBook(7)">Applications of INLA</li>
+      <li onclick="showBook(8)">INLA in Ecology and Environment</li>
+      <li onclick="showBook(9)">Bayesian Spatial Analysis</li>
+      <li onclick="showBook(10)">INLA for Beginners</li>
+    </ul>
+
+    <div class="book-display" id="bookDisplay">
+      <img id="bookImage" src="" alt="Book Cover" />
+      <p><a id="bookLink" href="#" target="_blank">View Resource</a></p>
+    </div>
+  </section>
+
+  <footer class="team-footer">
+    <p>&copy; 2025 INLA Project</p>
+  </footer>
+
+  <script>
+    const books = {
+      1: { image: "images/book1.png", link: "#", title: "Bayesian Inference with INLA" },
+      2: { image: "images/book2.png", link: "#", title: "Spatial Modeling using INLA" },
+      3: { image: "images/book3.png", link: "#", title: "Advanced Topics in INLA" },
+      4: { image: "images/book4.jpg", link: "#", title: "INLA for Spatio-Temporal Models" },
+      5: { image: "images/book5.jpg", link: "#", title: "Hierarchical Bayesian Models" },
+      6: { image: "images/book6.jpg", link: "#", title: "INLA Cookbook" },
+      7: { image: "images/book7.jpg", link: "#", title: "Applications of INLA" },
+      8: { image: "images/book8.png", link: "#", title: "INLA in Ecology and Environment" },
+      9: { image: "images/book9.jpg", link: "#", title: "Bayesian Spatial Analysis" },
+      10: { image: "images/book10.png", link: "#", title: "INLA for Beginners" },
+    };
+
+    function showBook(id) {
+      const book = books[id];
+      document.getElementById("bookImage").src = book.image;
+      document.getElementById("bookImage").alt = book.title;
+      document.getElementById("bookLink").href = book.link;
+      document.getElementById("bookLink").textContent = `View Resource for "${book.title}"`;
+    }
+  </script>
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>
+

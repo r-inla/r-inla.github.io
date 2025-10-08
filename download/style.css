@@ -53,8 +53,8 @@ body {
 /* CODE BLOCKS */
 .content-section code {
   display: block;
-  background-color: #008080; /* Teal background */
-  color: #ffffff; /* White text */
+  background-color: #e0f4f3; /* Teal background */
+  color: #004c4c; /* White text */
   padding: 14px 16px;
   margin: 14px 0;
   border-left: 4px solid #bbcf32;
@@ -166,5 +166,29 @@ a:hover {
   .content-section td:nth-of-type(1)::before { content: "R Version"; }
   .content-section td:nth-of-type(2)::before { content: "INLA Version"; }
   .content-section td:nth-of-type(3)::before { content: "Command"; }
+}
+
+.code-wrapper {
+  position: relative;
+  margin: 16px 0;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #006d77;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  z-index: 1;
+}
+
+.copy-btn:hover {
+  background-color: #004f57;
 }
 

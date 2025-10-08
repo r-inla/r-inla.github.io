@@ -1,0 +1,51 @@
+name: Sync INLA Function Reference
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+
+jobs:
+  build-and-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout site repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone hrue/r-inla
+        run: git clone --depth 1 https://github.com/hrue/r-inla.git /tmp/r-inla
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: /tmp/r-inla/rinla
+          extra-packages: pkgdown
+          needs: website
+
+      - name: Build pkgdown site
+        run: |
+          Rscript -e 'setwd("/tmp/r-inla/rinla"); pkgdown::build_site(preview = FALSE, new_process = FALSE)'
+
+      - name: Sync docs into site
+        run: |
+          rsync -a --delete /tmp/r-inla/docs/ learnmore/docs/
+
+      - name: Commit and push if there are changes
+        run: |
+          if [ -n "$(git status --porcelain learnmore/docs)" ]; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add learnmore/docs
+            git commit -m "chore: sync INLA function reference"
+            git push
+          else
+            echo "No changes to commit."
+          fi

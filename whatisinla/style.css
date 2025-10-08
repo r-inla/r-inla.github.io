@@ -8,8 +8,10 @@ body {
 
 /* Header Section */
 .team-header {
-  background-color: #006d77;
   text-align: center;
+  background: linear-gradient(135deg, #006d77 0%, #0b8793 100%);
+  position: relative;
+  overflow: hidden;
   padding: 50px 20px;
   border-bottom: 4px solid #bbcf32;
 }
@@ -26,6 +28,21 @@ body {
   color: #e0f7f5;
   margin-top: 0;
 }
+
+/* Optional hero image overlay */
+.team-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-image, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+  filter: saturate(70%) blur(1px);
+  pointer-events: none;
+}
+
+.team-header > * { position: relative; z-index: 1; }
 
 /* Content */
 .content-section {
@@ -84,4 +101,3 @@ body {
   background-color: #004f57;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
-

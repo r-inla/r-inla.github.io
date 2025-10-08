@@ -11,9 +11,9 @@ output:
     highlight: tango
 ---
 
-## 📘 Example Description
+## Example Description
 
-This example demonstrates how to fit a **Poooooooooooooooooooooooooooooooooooooooooooooisson generalized linear model (GLM)** using the `INLA` package in R.  
+This example demonstrates how to fit a **Poisson generalized linear model (GLM)** using the `INLA` package in R.  
 We simulate a small dataset with one covariate and analyze the posterior distribution of the regression coefficients.
 
 - **Goal:** Demonstrate basic INLA syntax and workflow  
@@ -22,7 +22,7 @@ We simulate a small dataset with one covariate and analyze the posterior distrib
 
 ---
 
-## 📊 Data Description
+## Data Description
 
 We generate Poisson count data with one covariate \(x\):
 
@@ -45,7 +45,7 @@ head(data)
 
 ---
 
-## 📐 Model Specification and Fitting
+## Model Specification and Fitting
 
 We fit a Poisson regression model using `inla()` with the formula `y ~ x`:
 
@@ -62,7 +62,7 @@ result <- inla(formula, family = "poisson", data = data)
 
 ---
 
-## 📈 Posterior Results and Summary
+## Posterior Results and Summary
 
 We summarize the fixed effects and visualize the posterior means.
 
@@ -87,7 +87,7 @@ result$summary.fixed[, c("mean", "0.025quant", "0.975quant")]
 
 ---
 
-## 🧠 Interpretation of Results
+## Interpretation of Results
 
 - **Intercept (β₀)** ≈ 1, matching the true value.  
 - **Slope (β₁)** ≈ 0.5, matching the simulated value.  
@@ -95,7 +95,7 @@ result$summary.fixed[, c("mean", "0.025quant", "0.975quant")]
 
 ---
 
-## 📊 Observed vs. Fitted Values
+## Observed vs. Fitted Values
 
 We now compare observed versus fitted values:
 
@@ -112,7 +112,7 @@ abline(0, 1, col = "red", lty = 2)
 
 ---
 
-## 📝 Comments and Extensions
+## Comments and Extensions
 
 This is a minimal INLA example. You can extend it to:
 
@@ -135,7 +135,7 @@ summary(result2)
 
 ---
 
-## 📎 References
+## References
 
 - Rue, H., Martino, S., & Chopin, N. (2009).  
   *Approximate Bayesian inference for latent Gaussian models using integrated nested Laplace approximations (INLA).* JRSS-B.  

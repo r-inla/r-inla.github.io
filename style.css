@@ -90,11 +90,15 @@ nav a:hover {
   text-align: center;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
   border-top: 4px solid #bbcf32;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: block;
+  text-decoration: none;
+  color: #006d77;
 }
 
 .button-box:hover {
   transform: translateY(-5px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
 }
 
 .icon-circle {
@@ -115,12 +119,74 @@ nav a:hover {
   object-fit: contain;
 }
 
-.button-box a {
+.button-box span {
   display: block;
   font-weight: 600;
   color: #006d77;
-  text-decoration: none;
   font-size: 15px;
+}
+
+.button-box:hover span {
+  color: #dd8545;
+}
+
+.button-box:focus {
+  outline: 3px solid #bbcf32;
+  outline-offset: 4px;
+}
+
+/* === MAP SECTION === */
+.map-callout {
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1faf8 0%, #ffffff 100%);
+  padding: 70px 20px;
+  margin: 70px 0 80px;
+  border-top: 1px solid #e0eceb;
+  border-bottom: 1px solid #e0eceb;
+}
+
+.map-callout__content {
+  max-width: 880px;
+  text-align: center;
+}
+
+.map-callout__content h2 {
+  font-size: 32px;
+  color: #0f2743;
+  margin-bottom: 16px;
+}
+
+.map-callout__content p {
+  font-size: 18px;
+  color: #264660;
+  margin: 0 auto 26px;
+  max-width: 720px;
+  line-height: 1.65;
+}
+
+.map-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 30px;
+  background: #006d77;
+  color: #ffffff;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-button:hover {
+  background: #004f57;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.map-callout__credit {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #3b5c70;
 }
 
 /* === SIDE BUTTONS === */
@@ -266,4 +332,3 @@ nav a:hover {
 .sidebar:hover ~ .main-content-wrapper {
   margin-left: 220px;
 }
-

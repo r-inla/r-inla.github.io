@@ -1,102 +1,229 @@
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #ffffff;
-  margin: 0;
-  padding: 0;
-  color: #222;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INLA Books</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="team-header">
+    <h1>Books on INLA</h1>
+    <p>Explore textbooks and handbooks dedicated to INLA and its applications</p>
+  </header>
 
-.team-header {
-  text-align: center;
-  background-color: #f0f4f8;
-  padding: 40px 20px;
-  border-bottom: 1px solid #ddd;
-}
+  <section class="books-section">
+    <div class="book-grid">
 
-.team-header h1 {
-  font-size: 32px;
-  color: #006d77;
-  margin-bottom: 10px;
-}
+      <div class="book-card">
+        <img src="images/book1.png" alt="Gaussian Markov Random Fields Book Cover">
+        <h3>Gaussian Markov Random Fields</h3>
+        <h4>Theory and Applications</h4>
 
-.team-header p {
-  font-size: 18px;
-  color: #444;
-}
+        <div class="book-links">
+          <a href="https://drive.google.com/file/d/1q_wQKYa91DHW_nlD6Fm5Mmg_zJcMa9Rz/view?usp=sharing" target="_blank">📝 Errata</a>
+          <a href="https://www.routledge.com/Gaussian-Markov-Random-Fields-Theory-and-Applications/Rue-Held/p/book/9781584884323" target="_blank">🛒 Pre-Order</a>
+        </div>
 
-.books-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  padding: 40px 20px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
+        <p class="book-description">
+          <strong>Gaussian Markov Random Field (GMRF)</strong> models are widely used in spatial statistics, a very active area of research with few up-to-date references.
+          This is the first book that provides a unified framework for GMRFs with an emphasis on computational aspects.
+          <br><br>
+          It includes extensive case studies and a C-library for fast and exact simulation. With chapters by leading researchers, this volume is essential
+          reading for statisticians and scientists working with spatial data across a range of disciplines.
+        </p>
+      </div>
 
-.book-card {
-  background-color: #f9fafc;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
-}
+      
+      <div class="book-card">
+        <img src="images/book2.png" alt="Advanced Spatial Modeling with SPDEs Book Cover">
+        <h3>Advanced Spatial Modeling with Stochastic Partial Differential Equations</h3>
+        <h4>Using R and INLA</h4>
+        <div class="book-links">
+          <a href="https://becarioprecario.bitbucket.io/spde-gitbook/" target="_blank">📘 Read Online</a>
+          <a href="https://inla.r-inla-download.org/shared/spde-book/spde-book-files.zip" target="_blank">💾 Download Code</a>
+          <a href="https://www.routledge.com/Advanced-Spatial-Modeling-with-Stochastic-Partial-Differential-Equations/Krainski-Gomez-Rubio-Bakka-Lenzi-Castro-Camilo-Simpson-Lindgren-Rue/p/book/9781138369856" target="_blank">🛒 Pre-Order</a>
+        </div>
+        <p class="book-description">
+          <strong>Modeling spatial and spatio-temporal continuous processes</strong> is an important and challenging problem in spatial statistics.
+          <em>Advanced Spatial Modeling with Stochastic Partial Differential Equations Using R and INLA</em> describes the SPDE approach for modeling continuous spatial processes 
+          with a Matérn covariance, implemented using INLA in the R-INLA package. Examples include simulated data and real-world applications.
+        </p>
+      </div>
 
-.book-card:hover {
-  transform: translateY(-5px);
-}
+      <div class="book-card">
+        <img src="images/book3.png" alt="Bayesian Inference with INLA Book Cover">
+        <h3>Bayesian Inference with INLA</h3>
 
-.book-card img {
-  width: 100%;
-  max-height: 260px;
-  object-fit: contain;
-  border-radius: 6px;
-  margin-bottom: 15px;
-}
+        <div class="book-links">
+          <a href="https://becarioprecario.bitbucket.io/inla-gitbook/" target="_blank">📘 Read Online</a>
+          <a href="https://becarioprecario.github.io/files/inla-book-files.zip" target="_blank">💾 Download Code</a>
+          <a href="https://becarioprecario.github.io/files/inla-book-errata.pdf" target="_blank">📝 Errata </a>
+          <a href="https://www.routledge.com/Bayesian-inference-with-INLA/Gomez-Rubio/p/book/9781138039872" target="_blank">🛒 Pre-Order</a>
+        </div>
 
-.book-card h3 {
-  font-size: 18px;
-  color: #006d77;
-  margin: 10px 0 6px;
-}
+        <p class="book-description">
+          <strong>Bayesian Inference with INLA</strong> provides a comprehensive introduction to the INLA method and its R implementation for model fitting.
+          It covers both the underlying methodology and practical usage to fit a wide range of models using R.
+          <br><br>
+          Topics include generalized linear mixed-effects models, multilevel models, spatial and spatio-temporal models, smoothing methods, survival analysis,
+          imputation of missing values, and mixture models. The book also discusses advanced features and how to extend the package with custom priors and latent models.
+        </p>
+      </div>
+      
+      <div class="book-card">
+        <img src="images/book4.jpg" alt="Spatial and Spatio-temporal Bayesian Models Book Cover">
+        <h3>Spatial and Spatio-temporal Bayesian Models with R - INLA</h3>
 
-.book-card p {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 14px;
-}
+        <div class="book-links">
+          <a href="https://github.com/michelacameletti/Spatial-and-Spatio-Temporal-Bayesian-Models-with-R-INLA?tab=readme-ov-file" target="_blank">💻 Code on GitHub</a>
+          <a href="https://www.wiley.com/en-us/Spatial+and+Spatio-temporal+Bayesian+Models+with+R+-+INLA-p-9781118326558" target="_blank">🛒 Pre-Order</a>
+        </div>
 
-.book-card a {
-  color: #006d77;
-  text-decoration: none;
-  font-weight: 600;
-}
+        <p class="book-description">
+          <strong>Spatial and Spatio-Temporal Bayesian Models with R-INLA</strong> offers a practically oriented and innovative presentation of Bayesian methodology applied to spatial statistics.
+          <br><br>
+          It introduces Bayesian theory with a focus on spatial and spatio-temporal models and includes practical examples from epidemiology, biostatistics, and social sciences — all implemented in the <code>R-INLA</code> package.
+          The book provides a valuable alternative to traditional MCMC simulations with reproducible code and real data applications.
+        </p>
+      </div>
 
-.book-card a:hover {
-  text-decoration: underline;
-}
+      <div class="book-card">
+        <img src="images/book5.jpg" alt="Bayesian Regression Modeling with INLA Book Cover">
+        <h3>Bayesian Regression Modeling with INLA</h3>
 
-.back-button {
-  padding: 10px 24px;
-  background-color: #006d77;
-  color: #fff;
-  text-decoration: none;
-  font-weight: 600;
-  border-radius: 30px;
-  transition: background-color 0.3s ease;
-  display: inline-block;
-}
+        <div class="book-links">
+          <a href="https://julianfaraway.github.io/brinla/" target="_blank">💻 Code and Resources</a>
+          <a href="https://www.routledge.com/Bayesian-Regression-Modeling-with-INLA/Wang-YueRyan-Faraway/p/book/9780367572266" target="_blank">🛒 Pre-Order</a>
+        </div>
 
-.back-button:hover {
-  background-color: #004f57;
-}
+        <p class="book-description">
+          <strong>Bayesian Regression Modeling with INLA</strong> explores a wide range of modern regression models using real-world data and the INLA approach.
+          <br><br>
+          It emphasizes the interplay of theory and practice with reproducible examples and complete R commands. A companion website hosts all the datasets and R code used in the book,
+          along with an R package for additional functionality.
+        </p>
+      </div>
 
-.team-footer {
-  text-align: center;
-  padding: 24px 10px;
-  background-color: #f8f9fa;
-  font-size: 14px;
-  color: #888;
-  border-top: 1px solid #eee;
-}
+      <div class="book-card">
+        <img src="images/book6.jpg" alt="Geospatial Health Data Book Cover">
+        <h3>Geospatial Health Data</h3>
+        <h4>Modeling and Visualization with R-INLA and Shiny</h4>
+
+        <div class="book-links">
+          <a href="https://www.paulamoraga.com/book-geospatial/" target="_blank">📘 Read Online</a>
+          <a href="https://www.routledge.com/Geospatial-Health-Data-Modeling-and-Visualization-with-R-INLA-and-Shiny/Moraga/p/book/9780367357955" target="_blank">🛒 Pre-Order</a>
+        </div>
+
+        <p class="book-description">
+          <strong>Geospatial Health Data</strong> introduces spatial and spatio-temporal statistical methods for analyzing and visualizing health data using R-INLA and Shiny.
+          <br><br>
+          The book covers data manipulation, Bayesian hierarchical modeling, spatial modeling with SPDE and INLA, and interactive data visualization using R and Shiny.
+          It features fully reproducible real-world case studies and provides clear R code to support students, researchers, and practitioners working with georeferenced data.
+        </p>
+      </div>
+
+      <div class="book-card">
+        <img src="images/book7.jpg" alt="Beginner’s Guide to Ecological Data Analysis Book Cover">
+        <h3>Beginner’s Guide to Spatial, Temporal and Spatial-Temporal Ecological Data Analysis with R-INLA</h3>
+        <h4>Volume I: Using GLM and GLMM</h4>
+
+        <div class="book-links">
+          <a href="https://www.highstat.com/index.php/books2?view=article&id=11&catid=18" target="_blank">📘 View Online</a>
+          <a href="https://www.highstat.com/index.php/order-books-hika/product/9-book-beginner-s-guide-to-spatial-temporal-and-spatial-temporal-ecological-data-analysis-with-r-inla-volume-i-using-gm-and-glmm-2017" target="_blank">🛒 Pre-Order</a>
+        </div>
+
+        <p class="book-description">
+          <strong>Volume I</strong> introduces linear models, GLMs, and GLMMs for analyzing spatial, temporal, and spatial-temporal ecological data using R-INLA.
+          Models cover Gaussian and gamma distributions (continuous data), Poisson and negative binomial (count data), and Bernoulli and binomial (binary/proportional data).
+        </p>
+      </div>
+
+  
+      <div class="book-card">
+        <img src="images/book8.png" alt="Beginner’s Guide Volume II Book Cover">
+        <h3>Beginner’s Guide to Spatial, Temporal and Spatial-Temporal Ecological Data Analysis with R-INLA</h3>
+        <h4>Volume II: GAM and Zero-Inflated Models</h4>
+
+        <div class="book-links">
+          <a href="https://www.highstat.com/index.php/books2?view=article&id=11&catid=18" target="_blank">📘 View Online</a>
+          <a href="https://www.highstat.com/index.php/order-books-hika/product/10-book-beginner-s-guide-to-spatial-temporal-and-spatial-temporal-ecological-data-analysis-with-r-inla-volume-ii-gam-and-zero-inflated-models-2018" target="_blank">🛒 Pre-Order</a>
+        </div>
+
+        <p class="book-description">
+          <strong>Volume II</strong> extends the methods from Volume I with zero-inflated and generalized additive (mixed-effects) models for spatial and spatial-temporal data.
+          <br><br>
+          The book includes fully reproducible R code, datasets, and detailed guidance for ecological applications using the INLA framework.
+        </p>
+      </div>
+
+      
+      <div class="book-card">
+        <img src="images/book9.jpg" alt="Dynamic Time Series Models using R-INLA Book Cover">
+        <h3>Dynamic Time Series Models using R-INLA</h3>
+        <h4>An Applied Perspective</h4>
+
+        <div class="book-links">
+          <a href="https://ramanbala.github.io/dynamic-time-series-models-R-INLA/" target="_blank">📘 Read Online</a>
+          <a href="https://www.routledge.com/Dynamic-Time-Series-Models-using-R-INLA-An-Applied-Perspective/Ravishanker-Raman-Soyer/p/book/9780367654276" target="_blank">🛒 Pre-Order</a>
+        </div>
+
+        <p class="book-description">
+          <strong>Dynamic Time Series Models using R-INLA: An Applied Perspective</strong> is the outcome of a joint effort to systematically describe the use of R-INLA
+          for analysing time series data, with accompanying code and practical examples.
+          <br><br>
+          This book introduces the theoretical underpinnings of R-INLA along with the tools needed for modelling various types of time series
+          using an approximate Bayesian framework.
+        </p>
+      </div>
+
+      <div class="book-card">
+        <img src="images/book10.png" alt="Spatial Statistics for Data Science Book Cover">
+        <h3>Spatial Statistics for Data Science</h3>
+        <h4>Theory and Practice with R</h4>
+
+        <div class="book-links">
+          <a href="https://www.paulamoraga.com/book-spatial/" target="_blank">📘 Read Online</a>
+          <a href="https://www.routledge.com/Spatial-Statistics-for-Data-Science-Theory-and-Practice-with-R/Moraga/p/book/9781032633510" target="_blank">🛒 Pre-Order</a>
+        </div>
+
+        <p class="book-description">
+          <strong>Spatial Statistics for Data Science</strong> offers a practical and theoretical guide to analyzing spatial data using R. It covers spatial data types, modeling techniques, and visualization methods with reproducible real-world examples.
+          <br><br>
+          The book includes applications in public health, environment, ecology, and urban studies, and demonstrates how to use INLA and SPDE for Bayesian spatial modeling.
+        </p>
+      </div>
+
+
+    </div>
+  </section>
+
+  <div class="back-link">
+    <a href="../index.html">&larr; Back to Home</a>
+  </div>
+
+  <footer class="team-footer">
+    <p>&copy; 2025 INLA Project</p>
+  </footer>
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>
+

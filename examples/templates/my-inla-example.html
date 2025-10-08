@@ -11,7 +11,7 @@
 
 <meta name="author" content="Your Name" />
 
-<meta name="date" content="2025-05-16" />
+<meta name="date" content="2025-05-23" />
 
 <title>INLA Example: Poisson GLM with One Covariate</title>
 
@@ -1571,16 +1571,15 @@ border-radius: 0px;
 <h1 class="title toc-ignore">INLA Example: Poisson GLM with One
 Covariate</h1>
 <h4 class="author">Your Name</h4>
-<h4 class="date">2025-05-16</h4>
+<h4 class="date">2025-05-23</h4>
 
 </div>
 
 
 <div id="example-description" class="section level2" number="1">
-<h2><span class="header-section-number">1</span> 📘 Example
+<h2><span class="header-section-number">1</span> Example
 Description</h2>
-<p>This example demonstrates how to fit a
-<strong>Poooooooooooooooooooooooooooooooooooooooooooooisson generalized
+<p>This example demonstrates how to fit a <strong>Poisson generalized
 linear model (GLM)</strong> using the <code>INLA</code> package in
 R.<br />
 We simulate a small dataset with one covariate and analyze the posterior
@@ -1597,8 +1596,7 @@ workflow<br />
 <hr />
 </div>
 <div id="data-description" class="section level2" number="2">
-<h2><span class="header-section-number">2</span> 📊 Data
-Description</h2>
+<h2><span class="header-section-number">2</span> Data Description</h2>
 <p>We generate Poisson count data with one covariate <span class="math inline">\(x\)</span>:</p>
 <p><span class="math display">\[
 \eta = \beta_0 + \beta_1 x, \quad y \sim \text{Poisson}(\mu), \quad \mu
@@ -1617,8 +1615,8 @@ Description</h2>
 <hr />
 </div>
 <div id="model-specification-and-fitting" class="section level2" number="3">
-<h2><span class="header-section-number">3</span> 📐 Model Specification
-and Fitting</h2>
+<h2><span class="header-section-number">3</span> Model Specification and
+Fitting</h2>
 <p>We fit a Poisson regression model using <code>inla()</code> with the
 formula <code>y ~ x</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Load INLA</span></span>
@@ -1632,8 +1630,8 @@ formula <code>y ~ x</code>:</p>
 <hr />
 </div>
 <div id="posterior-results-and-summary" class="section level2" number="4">
-<h2><span class="header-section-number">4</span> 📈 Posterior Results
-and Summary</h2>
+<h2><span class="header-section-number">4</span> Posterior Results and
+Summary</h2>
 <p>We summarize the fixed effects and visualize the posterior means.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Summary of fixed effects</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>result<span class="sc">$</span>summary.fixed</span></code></pre></div>
@@ -1648,7 +1646,7 @@ and Summary</h2>
 <hr />
 </div>
 <div id="interpretation-of-results" class="section level2" number="5">
-<h2><span class="header-section-number">5</span> 🧠 Interpretation of
+<h2><span class="header-section-number">5</span> Interpretation of
 Results</h2>
 <ul>
 <li><strong>Intercept (β₀)</strong> ≈ 1, matching the true value.<br />
@@ -1662,7 +1660,7 @@ positive effect of <span class="math inline">\(x\)</span> on <span class="math i
 <hr />
 </div>
 <div id="observed-vs.-fitted-values" class="section level2" number="6">
-<h2><span class="header-section-number">6</span> 📊 Observed vs. Fitted
+<h2><span class="header-section-number">6</span> Observed vs. Fitted
 Values</h2>
 <p>We now compare observed versus fitted values:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Add fitted values to data</span></span>
@@ -1676,7 +1674,7 @@ Values</h2>
 <hr />
 </div>
 <div id="comments-and-extensions" class="section level2" number="7">
-<h2><span class="header-section-number">7</span> 📝 Comments and
+<h2><span class="header-section-number">7</span> Comments and
 Extensions</h2>
 <p>This is a minimal INLA example. You can extend it to:</p>
 <ul>
@@ -1700,7 +1698,7 @@ measures, or count data in epidemiology</li>
 <hr />
 </div>
 <div id="references" class="section level2" number="8">
-<h2><span class="header-section-number">8</span> 📎 References</h2>
+<h2><span class="header-section-number">8</span> References</h2>
 <ul>
 <li>Rue, H., Martino, S., &amp; Chopin, N. (2009).<br />
 <em>Approximate Bayesian inference for latent Gaussian models using
@@ -1786,5 +1784,23 @@ $(document).ready(function ()  {
   })();
 </script>
 
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
 </body>
 </html>

@@ -35,85 +35,58 @@ body {
   line-height: 1.75;
 }
 
-/* Collapsible Sections - Primary */
-details {
-  margin-bottom: 16px;
-  border: 1px solid #bbcf32;
+/* Paper Sections */
+.paper-section {
+  margin-bottom: 48px;
+}
+
+.paper-section h2 {
+  font-size: 28px;
+  color: #006d77;
+  margin-bottom: 24px;
+  text-transform: none;
+}
+
+.paper-entry {
+  background-color: #f1faf8;
+  border-left: 4px solid #bbcf32;
+  padding: 18px 20px;
   border-radius: 10px;
-  padding: 12px 18px;
-  background-color: #e0f4f3;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 18px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
 }
 
-/* Collapsible Sections - Nested */
-details details {
-  background-color: #e0f4f3;
-  margin-top: 12px;
-  margin-left: 16px;
-  border-left: 3px solid #bbcf32;
-  padding-left: 16px;
-  padding-right: 0;
+.paper-entry h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: #0f2743;
 }
 
-/* Summary Title Styles */
-summary {
+.paper-entry p {
+  margin: 0 0 8px;
+}
+
+.paper-entry p:last-child {
+  margin-bottom: 0;
+}
+
+.paper-entry a {
+  color: #006d77;
   font-weight: 600;
-  cursor: pointer;
-  font-size: 18px;
-  color: #006d77;
-  list-style: none;
-  outline: none;
-  position: relative;
-  padding-left: 1.2em;
-}
-
-/* Restore Arrows */
-summary::before {
-  content: "▶";
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform: translateY(2px);
-  font-size: 14px;
-  color: #006d77;
-  transition: transform 0.2s ease;
-}
-
-details[open] > summary::before {
-  content: "▼";
-  transform: translateY(2px);
-}
-
-/* Subcategory Summary */
-details details summary {
-  font-size: 16px;
-  color: #006d77;
-  padding-left: 1.2em;
-}
-
-details details summary::before {
-  font-size: 12px;
-}
-
-/* Paper List */
-ul.paper-list {
-  margin: 10px 0 0 20px;
-  padding: 0;
-}
-
-ul.paper-list li {
-  margin-bottom: 10px;
-}
-
-ul.paper-list li a {
-  color: #006d77;
   text-decoration: none;
-  font-weight: 500;
 }
 
-ul.paper-list li a:hover {
+.paper-entry a:hover {
   color: #dd8545;
   text-decoration: underline;
+}
+
+.paper-separator {
+  text-align: center;
+  letter-spacing: 3px;
+  color: #006d77;
+  margin: 40px 0;
+  font-weight: 600;
 }
 
 /* Back Button */
@@ -143,4 +116,3 @@ ul.paper-list li a:hover {
   color: #888;
   border-top: 1px solid #eee;
 }
-

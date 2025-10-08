@@ -1,0 +1,462 @@
+---
+title: "Non-stationary Spatial Model for Dengue in Brazil: A Hands-On Guide"
+author: "Esmail Abdul Fattah"
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    theme: flatly
+    highlight: pygments
+bibliography: references.bib
+header-includes:
+  - |
+    <!-- Professional fonts: Inter for text/headings, JetBrains Mono for code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+      html { font-size: 17px; }
+      body {
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+                     "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif !important;
+        line-height: 1.6; color: #222; letter-spacing: .1px;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        font-weight: 700; letter-spacing: .2px; color: #111;
+      }
+      h1 { font-size: 2rem; margin-top: 1.5em; }
+      h2 { font-size: 1.6rem; margin-top: 1.4em; }
+      h3 { font-size: 1.3rem; margin-top: 1.2em; }
+      code, pre, kbd, samp {
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace !important;
+      }
+      pre code { font-size: .9em; }
+      blockquote { color: #555; border-left: 4px solid #e5e7eb; padding-left: 1rem; margin-left: 0; }
+      .tocify, .toc-content { font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+      table { font-size: .95em; }
+    </style>
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## 1. Motivation and Aim
+
+Spatial disease risk **rarely varies uniformly** across large areas. The standard (stationary) Besag model assumes a **single precision** (i.e., a single smoothness/variance level) everywhere. In contrast, the **non-stationary `fbesag`** model allows the precision to **vary by sub-region**, while still sharing information across boundaries. A **joint penalized-complexity (PC) prior** controls flexibility and **contracts** back to the stationary model when the data do not support heterogeneity [@abdulfattah2024].
+
+**Goal of this guide.** Reproduce a dengue mapping analysis over Brazil’s **558 microregions** and demonstrate how allowing **region-specific spatial precisions** can change inference and uncertainty. We will:
+
+- Visualize administrative vs. biome-based partitions.
+- Fit a **stationary Besag** model and a **flexible `fbesag`** model.
+- Compare goodness-of-fit and predictive diagnostics (DIC, logML, GCPO, MAE).
+- Inspect **SMR** and **difference maps** to interpret non-stationarity.
+
+> **Folder assumption.** Place this Rmd in a folder that also contains `brazil_558_microregions.RData` and `references.bib` (see the *Data & Files* section).
+
+---
+
+## 2. Data & Files
+
+We expect a single `.RData` file with all required objects to keep the workflow simple and reproducible.
+
+- **`brazil_558_microregions.RData`** containing:
+  - `data`: one row per observation (e.g., microregion-month). Required columns:
+    - `Y`: observed counts,
+    - `E`: expected counts (or log-expected; set `E_is_log = TRUE` if so),
+    - `S1`: microregion index in `1:558`,
+    - `S3`: administrative region ID (used as one partition option),
+    - `S4`: biome ID (used as the alternative partition),
+    - `T1`: time index (for the `rw1` temporal component).
+  - `graph`: the 558×558 adjacency/precision structure for the spatial field (sparse or dense).
+  - `map_df`: an `sf` object with **558 polygons** (one per microregion, in the same order as `S1`).
+
+> If `map_df` contains an `S1` column, it is safer to **join by key**; this document assumes aligned row order for simplicity.
+
+---
+
+## 3. Packages
+
+We load the analysis stack and optionally install missing packages if needed.
+
+```{r packages}
+# Optionally install missing packages (set to TRUE if you need auto-install)
+auto_install <- FALSE
+
+need <- c("INLA","fbesag","ggplot2","ggthemes","spdep","hydroGOF","dplyr","tibble","sf","scales","knitr")
+to_install <- need[!vapply(need, requireNamespace, FALSE, quietly = TRUE)]
+
+if (length(to_install) > 0 && auto_install) {
+  install.packages(setdiff(to_install, c("INLA","fbesag")))
+  if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+  if (!requireNamespace("INLA", quietly = TRUE)) remotes::install_version("INLA", version = "24.08.28")
+  if (!requireNamespace("fbesag", quietly = TRUE)) remotes::install_github("esmail-abdulfattah/fbesag")
+}
+
+suppressPackageStartupMessages({
+  library(INLA)
+  library(fbesag)
+  library(ggplot2)
+  library(ggthemes)
+  library(spdep)
+  library(hydroGOF)
+  library(dplyr)
+  library(tibble)
+  library(sf)
+  library(scales)
+  library(knitr)
+})
+```
+
+## 4. Load Data and Sanity Checks
+
+We load the single `.RData` file and verify that essential objects and sizes are present.
+
+```{r data}
+load("brazil_558_microregions.RData")
+
+stopifnot(exists("data"), exists("graph"), exists("map_df"))
+stopifnot(nrow(map_df) >= 558)  # one geometry per microregion
+```
+
+**Interpretation.** The `data` frame holds the response and covariates; `graph` encodes adjacency (used by INLA as the structure matrix); `map_df` enables cartographic output via `ggplot2` + `sf`.
+
+---
+
+## 5. Partition Selection & Offset Convention
+
+We prepare two **partitioning schemes**: (i) administrative regions (`S3`) and (ii) terrestrial biomes (`S4`). The model needs a **single partition ID per area**, but the `data` object is per observation; we therefore **collapse to per-area IDs** using the area index `S1`.
+
+We also specify whether `E` is already on the log-scale to use the correct **offset**.
+
+```{r partition-choice}
+# Partition toggle: administrative (FALSE) vs. terrestrial biomes (TRUE)
+Six_terrestrial_biomes <- FALSE
+
+# Expected counts: set TRUE if E is on the log-scale in your object
+E_is_log <- FALSE
+
+# Collapse per-observation vectors to per-area (length = 558)
+collapse_to_area <- function(area_index, values, n_areas = 558) {
+  vapply(seq_len(n_areas), function(i) {
+    vi <- values[area_index == i]
+    if (length(vi) == 0) return(NA_integer_)
+    u <- unique(vi)
+    u[1]
+  }, integer(1))
+}
+
+# Per-area IDs from S3/S4
+id_regions_admin_area <- collapse_to_area(data$S1, data$S3, n_areas = 558)
+id_regions_biome_area <- collapse_to_area(data$S1, data$S4, n_areas = 558)
+
+# Original recoding for the biome option
+id_regions_biome_area[id_regions_biome_area == 3] <- 2
+id_regions_biome_area[id_regions_biome_area == 4] <- 3
+id_regions_biome_area[id_regions_biome_area == 5] <- 4
+id_regions_biome_area[id_regions_biome_area == 6] <- 5
+
+# Active partition for modeling
+id_regions <- if (Six_terrestrial_biomes) id_regions_biome_area else id_regions_admin_area
+```
+
+**Why collapse?** Graphics (`map_df`) are at the **area-level**, but `S3/S4` live in the long-form `data`. Collapsing ensures factor assignments match the **558 areas** and prevents dimension mismatches.
+
+---
+
+## 6. Partition Maps
+
+We visualize both partitions to understand how sub-regions might drive **different spatial smoothness** under the flexible model.
+
+```{r region-maps, fig.width=7, fig.height=5}
+# Attach per-area IDs to the map (assumes row order aligns with area index)
+map_df$region_admin <- factor(id_regions_admin_area,
+                              levels = sort(unique(id_regions_admin_area)))
+map_df$region_biome <- factor(id_regions_biome_area,
+                              levels = sort(unique(id_regions_biome_area)))
+
+pal_admin <- hue_pal()(length(levels(map_df$region_admin)))
+pal_biome <- hue_pal()(length(levels(map_df$region_biome)))
+
+# Subtle borders for legibility
+border_col <- "#f7f7f7"
+
+p_admin <- ggplot(map_df) +
+  geom_sf(aes(fill = region_admin), linewidth = 0.15, color = border_col) +
+  scale_fill_manual(values = pal_admin, name = "Region") +
+  ggtitle("Administrative Grouping (S3)") +
+  theme_void() + theme(legend.position = "bottom")
+
+p_biome <- ggplot(map_df) +
+  geom_sf(aes(fill = region_biome), linewidth = 0.15, color = border_col) +
+  scale_fill_manual(values = pal_biome, name = "Biome") +
+  ggtitle("Terrestrial Biomes (S4)") +
+  theme_void() + theme(legend.position = "bottom")
+
+if (Six_terrestrial_biomes) p_biome else p_admin
+```
+
+**Interpretation.** If climatology or environmental gradients are important, the **biome partition** may better capture changes in spatial variability. If policy or health systems differ by region, the **administrative partition** can be more relevant.
+
+---
+
+## 7. Model Formulation
+
+We model counts using a **Poisson** likelihood with an **offset** for expected counts:
+
+\[
+Y_{i,t} \sim \text{Poisson}(E_{i,t}\, e^{\eta_{i,t}}), \quad
+\eta_{i,t} = \mu + \alpha_i + \kappa_t.
+\]
+
+- \(\alpha_i\): spatial effect over microregions.  
+  - **Stationary Besag**: one global precision \(\tau\).  
+  - **Flexible `fbesag`**: **region-specific** precisions \(\tau_1,\ldots,\tau_P\) with **PC prior** that **contracts** to the stationary case [@abdulfattah2024].
+- \(\kappa_t\): **RW1** temporal trend.  
+- \(\mu\): intercept.
+
+We also **scale** the spatial structure (sum-to-zero constraint) for identifiability.
+
+```{r model-spec}
+# Scale the intrinsic graph for a sum-to-zero constraint
+constr.inter <- list(A = matrix(1, 1, dim(graph)[1]), e = rep(0, 1))
+scaled_graph <- as.matrix(INLA:::inla.scale.model(graph, constr.inter))
+
+# PC prior for the stationary Besag precision
+precision.prior <- list(prec = list(prior = "pc.prec", param = c(0.5, 0.01)))
+
+# Flexible model object (region-specific precisions)
+# sd_gamma controls the flexibility: smaller -> stronger contraction to stationarity
+fbesag.model <- fbesag::get_fbesag(
+  graph,
+  id       = id_regions[1:558],
+  sd_gamma = 0.15,
+  param    = list(p1 = 1, p2 = 1e-5)
+)
+
+# Indices for INLA
+data$c_S1 <- data$S1
+data$c_T1 <- data$T1
+
+# Expected counts for offset
+E_counts <- if (E_is_log) exp(data$E) else data$E
+
+# Stationary Besag (intrinsic via generic0)
+baseformula <- Y ~ 1 +
+  f(S1, model = "generic0",
+    Cmatrix = scaled_graph,
+    constr  = TRUE, rankdef = 1,
+    hyper   = precision.prior) +
+  f(T1, model = "rw1",
+    constr = TRUE, scale.model = TRUE,
+    hyper  = list(prec = list(prior = "pc.prec", param = c(0.5, 0.01))))
+
+# Flexible Besag
+formula <- Y ~ 1 +
+  f(S1, model = fbesag.model, constr = TRUE, rankdef = 1) +
+  f(T1, model = "rw1",
+    constr = TRUE, scale.model = TRUE,
+    hyper  = precision.prior)
+```
+
+**Notes.**  
+- The `generic0` latent effect uses the **scaled** structure matrix.  
+- `sd_gamma = 0.15` gives moderate flexibility; try `0.05` (tighter contraction) or `0.30` (more heterogeneity) in sensitivity checks.
+
+---
+
+## 8. Model Fitting with INLA
+
+We use INLA’s **Gaussian** strategy with **empirical Bayes** integration for speed and stable results. Both models share the same likelihood, offset, and temporal component to enable **fair comparison**.
+
+```{r fit, cache=FALSE}
+config_flag <- FALSE
+
+model_naive <- inla(
+  formula = baseformula, data = data, family = "poisson", offset = log(E_counts),
+  control.inla = list(strategy = "gaussian", int.strategy = "eb"),
+  control.compute = list(dic = TRUE, config = config_flag,
+                         cpo = TRUE, return.marginals = FALSE,
+                         control.gcpo = list(enable = TRUE, num.level.sets = 2)),
+  control.fixed = list(correlation.matrix = TRUE, prec.intercept = 1, prec = 1),
+  control.predictor = list(link = 1, compute = TRUE),
+  verbose = TRUE
+)
+
+model_fbesag <- inla(
+  formula = formula, data = data, family = "poisson", offset = log(E_counts),
+  control.inla = list(strategy = "gaussian", int.strategy = "eb"),
+  control.compute = list(dic = TRUE, config = config_flag,
+                         cpo = TRUE, return.marginals = FALSE,
+                         control.gcpo = list(enable = TRUE, num.level.sets = 2)),
+  control.fixed = list(correlation.matrix = TRUE, prec.intercept = 1, prec = 1),
+  control.predictor = list(link = 1, compute = TRUE),
+  verbose = TRUE
+)
+```
+
+**Tip.** For final results, consider re-fitting with **full Laplace** or **central composite design** (`int.strategy`) if runtime allows.
+
+---
+
+## 9. Model Comparison
+
+We summarize four complementary metrics:
+
+- **DIC**: lower is better (penalized fit).  
+- **logML**: higher is better (marginal likelihood).  
+- **GCPO**: lower is better (geometric mean of leave-one-out predictive *p*-values).  
+- **MAE**: lower is better (median fitted vs observed).
+
+```{r compare}
+mean_neglog <- function(v) {
+  v <- v[is.finite(v) & v > 0]
+  if (length(v) == 0) return(NA_real_)
+  -mean(log(v))
+}
+
+gcpo_naive  <- if (!is.null(model_naive$gcpo))  mean_neglog(model_naive$gcpo$gcpo) else mean_neglog(model_naive$cpo$cpo)
+gcpo_fbesag <- if (!is.null(model_fbesag$gcpo)) mean_neglog(model_fbesag$gcpo$gcpo) else mean_neglog(model_fbesag$cpo$cpo)
+
+mae_naive  <- hydroGOF::mae(model_naive$summary.fitted.values$`0.5quant`, data$Y, na.rm = TRUE)
+mae_fbesag <- hydroGOF::mae(model_fbesag$summary.fitted.values$`0.5quant`, data$Y, na.rm = TRUE)
+
+res <- tibble::tibble(
+  Model = c("Stationary Besag", "Flexible Besag"),
+  DIC   = c(round(model_naive$dic$dic, 0), round(model_fbesag$dic$dic, 0)),
+  logML = c(as.numeric(model_naive$mlik[1]), as.numeric(model_fbesag$mlik[1])),
+  GCPO  = c(gcpo_naive, gcpo_fbesag),
+  MAE   = c(mae_naive, mae_fbesag)
+)
+
+res$`Better than stationary?` <- c(NA,
+  (res$DIC[2]   < res$DIC[1]) &
+  (res$logML[2] > res$logML[1]) &
+  (res$GCPO[2]  < res$GCPO[1]) &
+  (res$MAE[2]   < res$MAE[1])
+)
+
+knitr::kable(res, digits = 3, align = "lrrrrc",
+             caption = "Lower DIC/GCPO/MAE and higher logML indicate improvement.")
+```
+
+**How to read this table.** If the flexible model improves **most/all** metrics, there is evidence that **spatial heterogeneity** in precision matters. If results are similar, the **PC prior** likely contracted to the stationary model—`fbesag` then serves as a **diagnostic** of stationarity.
+
+---
+
+## 10. SMR by Microregion
+
+The **Standardized Morbidity Ratio (SMR)** compares observed to expected counts (averaged over time for each microregion). It provides a **model-free** view of relative risk to contextualize what the spatial field is trying to capture.
+
+```{r smr, message=FALSE, warning=FALSE}
+# Average SMR per microregion
+SMR <- vapply(1:558, function(i) {
+  yy <- data$Y[data$S1 == i]
+  ee <- E_counts[data$S1 == i]
+  mean(yy / ee)
+}, numeric(1))
+
+map_df$SMR_cat <- cut(
+  SMR, breaks = c(-Inf, 0.5, 1, 2, 5, Inf),
+  labels = c("<0.5", "0.5–1", "1–2", "2–5", "5+"),
+  right = FALSE, ordered_result = TRUE
+)
+
+pal_smr <- c("#edf8fb", "#b2e2e2", "#66c2a4", "#2ca25f", "#006d2c")
+border_col <- "#f7f7f7"
+
+ggplot(map_df) +
+  geom_sf(aes(fill = SMR_cat), linewidth = 0.15, color = border_col) +
+  scale_fill_manual(values = pal_smr, name = "SMR") +
+  ggtitle("Standardized Morbidity Ratio (SMR) by Microregion") +
+  theme_void(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+**Interpretation.** Areas with **SMR > 1** show higher-than-expected counts; however, SMR is **noisy in small populations**. Spatial models stabilize these estimates via **borrowing strength**.
+
+---
+
+## 11. Non‑stationarity Diagnostics (fbesag vs. stationary)
+
+We inspect how the **posterior spatial effect** changes when allowing non-stationarity. We plot three **difference maps** (flexible − stationary): posterior **mean**, and the **2.5%** and **97.5%** quantiles.
+
+```{r diffs, message=FALSE, warning=FALSE}
+# Differences in spatial field summaries
+map_df$diff_mean <- model_fbesag$summary.random$S1$mean -
+                    model_naive$summary.random$S1$mean
+
+map_df$diff_q975 <- model_fbesag$summary.random$S1$`0.975quant` -
+                    model_naive$summary.random$S1$`0.975quant`
+
+map_df$diff_q025 <- model_fbesag$summary.random$S1$`0.025quant` -
+                    model_naive$summary.random$S1$`0.025quant`
+
+ga_blue <- "#49B8F1"
+border_col <- "#f7f7f7"
+
+p_mean <- ggplot(map_df) +
+  geom_sf(aes(fill = diff_mean), linewidth = 0.15, color = border_col) +
+  scale_fill_gradient2(low = ga_blue, mid = "white", high = "red", midpoint = 0, name = "\u0394 mean") +
+  ggtitle("Difference in Posterior Mean of Spatial Effect (fbesag − stationary)") +
+  theme_void(base_size = 12)
+
+p_q975 <- ggplot(map_df) +
+  geom_sf(aes(fill = diff_q975), linewidth = 0.15, color = border_col) +
+  scale_fill_gradient2(low = ga_blue, mid = "white", high = "red", midpoint = 0, name = "\u0394 97.5%") +
+  ggtitle("Difference in 97.5th Percentile of Spatial Effect") +
+  theme_void(base_size = 12)
+
+p_q025 <- ggplot(map_df) +
+  geom_sf(aes(fill = diff_q025), linewidth = 0.15, color = border_col) +
+  scale_fill_gradient2(low = ga_blue, mid = "white", high = "red", midpoint = 0, name = "\u0394 2.5%") +
+  ggtitle("Difference in 2.5th Percentile of Spatial Effect") +
+  theme_void(base_size = 12)
+
+p_mean
+p_q975
+p_q025
+```
+
+**Interpretation.**  
+- Spatial zones where **mean differences** are large suggest regions where the **stationary assumption** is too restrictive.  
+- If **credible interval lengths** shrink under `fbesag`, it may indicate **better local borrowing** thanks to region-specific precisions.
+
+---
+
+## 12. Regional Summary (Optional)
+
+To summarize effects at the partition level, we compute the **average absolute change** in the posterior mean within each sub-region.
+
+```{r regional-summary}
+ch <- id_regions[1:558]
+abs_mean_diff_by_region <- vapply(sort(unique(ch)), function(k) {
+  mean(abs(map_df$diff_mean[ch == k]))
+}, numeric(1))
+
+tibble::tibble(
+  Region = sort(unique(ch)),
+  `Mean |Δ mean|` = abs_mean_diff_by_region
+) %>%
+  knitr::kable(digits = 4, caption = "Average absolute change in posterior mean (by sub-region).")
+```
+
+**Use.** Regions with larger values deserve closer inspection: they may be **drivers of non-stationarity** or reflect **true heterogeneity** in the underlying process.
+
+---
+
+## 13. Sensitivity & Reproducibility
+
+- **Sensitivity.** Adjust `sd_gamma` in `get_fbesag()` to probe how strongly the model deviates from stationarity. Smaller values (e.g., `0.05`) **shrink harder**; larger values (e.g., `0.30`) allow more heterogeneity.
+- **Reproducibility.** Ensure you record package versions (see below) and keep `brazil_558_microregions.RData` unchanged across runs.
+
+```{r session-info}
+sessionInfo()
+```
+
+## 14. References

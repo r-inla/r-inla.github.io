@@ -22,12 +22,12 @@
       While INLA is tailored for models that can be formulated as <strong>Latent Gaussian Markov Random Fields (GMRFs)</strong>, this class encompasses a wide array of commonly used models in practice. The method strategically exploits the sparsity and structure of these models to perform efficient inference.
     </p>
 
-    <p>
+    <!--<p>
       The <em>INLA manual</em> describes the usage and capabilities of the program, providing detailed guidance and a series of examples to help users apply INLA to a range of modeling tasks.
-    </p>
+    </p>-->
 
     <p class="resource-links">
-      <a href="https://inla.r-inla-download.org/r-inla.org/doc/inla-manual/inla-manual.pdf" target="_blank">📘 Download the INLA Manual</a><br>
+      <!--<a href="https://inla.r-inla-download.org/r-inla.org/doc/inla-manual/inla-manual.pdf" target="_blank">📘 Download the INLA Manual</a><br>-->
       <a href="https://becarioprecario.bitbucket.io/inla-gitbook/index.html" target="_blank">🚀 A Good Starting Guide (INLA GitBook)</a><br>
       <a href="../learnmore/index.html">📚 Learn More</a>
     </p>
@@ -41,6 +41,23 @@
   <footer class="team-footer">
     <p>&copy; 2025 INLA Project</p>
   </footer>
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
-

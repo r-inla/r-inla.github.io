@@ -1,0 +1,230 @@
+---
+title: 'Bivariate meta-analysis of sensitivity and specificity'
+author: 'Haziq Jamil'
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    highlight: tango
+bibliography: refs.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+::: {.alert .alert-info}
+**Note:**
+This document adapts examples from the legacy R-INLA documentation, authored by the R-INLA team.
+:::
+
+## Introduction
+
+The bivariate model is a model for meta-analysing diagnostic studies reporting pairs of sensitivity and specificity [@Reitsma_etal_2005].
+Preserving the bivariate structure of the data, pairs of sensitivity (Se) and specificity (Sp) are jointly analysed. 
+Any existing correlation between these two measures is taken into account via random effects.
+Covariates can be added to the bivariate model and have a separate effect on sensitivity and specificity.
+
+Data are taken from a meta-analysis conducted by [@Scheidler_etal_1997] to compare the utility of three types of diagnostic imaging---lymphangiography (LAG), computed tomography (CT) and magnetic resonance (MR)---to detect lymph node metastases in patients with cervical cancer.
+The dataset consists of a total of $46$ studies: 
+the first $17$ for LAG, the following $19$ for CT and the last $10$ for $MR$. 
+
+## Model
+
+We analyse this data set using a generalised linear mixed model approach
+[@Chu_Cole_2006]: 
+$$
+\begin{gathered}
+\text{TN}{^i} \mid \mu_i \sim \text{Bin}(\text{TN}{^i} + \text{FP}{^i}, \text{Sp}{^i}),
+\quad\quad
+\operatorname{logit}(\text{Sp}{^i}) = {\boldsymbol{X}}_i {\boldsymbol{\alpha}} + \mu_i,\\
+\text{TP}{^i} \mid \nu_i \sim \text{Bin}(\text{TP}{^i} + \text{FN}{^i}, \text{Se}{^i}),
+\quad\quad
+\operatorname{logit}(\text{Se}{^i}) = {\boldsymbol{Z}}_i {\boldsymbol{\beta}} + \nu_i,\\[0.3cm]
+{\mu_i \choose \nu_i} \sim \operatorname{N}_2 \left(\mathbf 0, \mathbf{W}^{-1}
+\right),
+\end{gathered}
+$$ 
+where 
+$$
+\mathbf{W}^{-1} = \begin{pmatrix} 
+1/\tau_\mu & \rho/\sqrt{\tau_\mu \tau_\nu} \\
+\rho/\sqrt{\tau_\mu \tau_\nu} & 1/\tau_\nu
+\end{pmatrix},
+$$ 
+and TN, FP, TP and FN represent the number of true
+negatives, false positives, true positives, and false negatives,
+respectively and
+${\boldsymbol{X}}_i, {\boldsymbol{Z}}_i$ are
+(possibly overlapping) vectors of covariates related to
+$\text{Sp} = \tfrac{\text{TN}}{\text{TN} + \text{FP}}$ and $\text{Se} = \tfrac{\text{TP}}{\text{TP} + \text{FN}}$. The index $i$ represents study $i$ in the
+meta-analysis. Here, 
+$$
+\begin{align*}
+{\boldsymbol{X}}_i {\boldsymbol{\alpha}} 
+&= \alpha_{\text{LAG}}\cdot \text{LAG}_i + \alpha_{\text{CT}} \cdot  \text{CT}_i + \alpha_{\text{MR}} \cdot \text{MR}_i \\
+{\boldsymbol{Z}}_i  {\boldsymbol{\beta}} 
+&= \beta_{\text{LAG}} \cdot \text{LAG}_i + \beta_{\text{CT}} \cdot \text{CT}_i + \beta_{\text{MR}} \cdot \text{MR}_i
+\end{align*}
+$$ 
+whereby 
+$$
+\begin{align*}
+        \text{LAG}_i &=
+        \begin{cases}
+            1 \quad \text{if} \quad i = 0, \ldots, 16\\
+            0 \quad \text{else}
+        \end{cases} \\
+        \text{CT}_i &=
+        \begin{cases}
+            1 \quad \text{if} \quad i = 17, \ldots, 35\\
+            0 \quad \text{else}
+        \end{cases} \\
+        \text{MR}_i &=
+        \begin{cases}
+            1 \quad \text{if} \quad i = 36, \ldots, 45\\
+            0 \quad \text{else}
+        \end{cases}
+\end{align*}
+$$ 
+
+### Priors
+
+The model has three hyperparameters ${\boldsymbol{\theta}} = (\log \tau_\mu,\log \tau_\nu, \rho)$. The correlation parameter is
+constrained to $[-1,1]$. We reparameterise the correlation parameter
+$\rho$ using Fisher's z-transformation as 
+$$
+\rho^* = \text{logit}\left(\frac{\rho+1}{2} \right)
+$$ 
+which assumes values over the whole real line and
+assign the following prior distribution to $\rho^*$ 
+$$
+\begin{align*}
+\rho^* &\sim \operatorname{N}(0,1/0.4) \\
+\log\tau_\mu &\sim \operatorname{LogGamma}(0.25, 0.025)\\
+\log\tau_\nu &\sim \operatorname{LogGamma}(0.25, 0.025)\\
+\end{align*}
+$$
+The prior precision of $0.4$ corresponds, roughly, to a uniform prior on $[-1,1]$ for $\rho$.  
+
+Instead of specifying separate prior distributions for the
+hyperparameters we could also assume that the precision matrix
+$$\mathbf{W}\;\sim\;\text{Wishart}_{p}(r, {\boldsymbol{R}}^{-1}), \quad p=2,$$
+where the Wishart distribution has density
+$$
+\pi(\mathbf{W}) = c^{-1} |\mathbf{W}|^{(r-(p+1))/2} \exp\left\{-\frac{1}{2}\operatorname{tr}(\mathbf{W}\mathbf{R})\right\}, \quad r > p+1
+$$
+and 
+$$
+c = 2^{(rp)/2} |\mathbf{R}|^{-r/2} \pi^{(p(p-1))/4}\prod_{j=1}^{p}
+    \Gamma((r+1-j)/2).
+$$ 
+Then,
+$$
+\text{E}(\mathbf{W}) = r\mathbf{R}^{-1}, \quad\text{and}\quad
+    \text{E}(\mathbf{W}^{-1}) = \mathbf{R}/(r-(p+1)).
+$$ 
+The parameters are $r$, $R_{11}$, $R_{22}$ and $R_{12}$, where
+$$
+{\boldsymbol{R}} =
+    \begin{pmatrix}
+        R_{11} &R_{12}\\
+        R_{21} & R_{22}
+    \end{pmatrix}
+$$ 
+and $R_{12} = R_{21}$ due to symmetry. The `inla()`
+function reports the posterior distribution for the hyperparameters
+$\log \tau_\mu, \log \tau_\nu$ and $\rho^*$ as for the other prior
+given above.
+
+### Structure
+
+For this model the data need to be represented in a different format.
+Instead of an alternating structure (as before) a block structure is required. 
+The first block contains the number of diseased persons $\text{TP}{^i}+\text{FN}{^i}$, true positives $\text{TP}{^i}$, an index, followed by the covariates columns for all $i=1$ (LAG, CT, MR), while the second block contains the number of non-diseased persons $\text{TN}{^i}+\text{FP}{^i}$, true negatives $\text{TN}{^i}$, an index, followed by the covariate columns for all $i=1$ (LAG, CT, MR). 
+That means values for TP and TN do not alternate for each study, but are
+structured block-wise. 
+The next subsection should clarify this formatting requirement.
+
+## Data
+
+The data file is structured, so that one study is represented by
+consecutive rows. 
+Each row contains the number of diseased persons
+$\text{TP}{^i}+\text{FN}{^i}$ (`N`), true positives $\text{TP}{^i}$ (`Y`), an index (`diid`), followed by the covariates columns (`lag.tp`, `lag.tn`, etc.). 
+
+```{r}
+#| message: false
+# Load libraries and data file
+library(tidyverse)
+library(INLA)
+data(BivMetaAnalysis)
+head(BivMetaAnalysis, 10)
+```
+
+## INLA
+
+The code to fit the INLA model is below.
+
+```{r}
+frm <- Y ~ -1 + lag.tp + lag.tn + ct.tp + ct.tn + mr.tp + mr.tn +
+  f(diid, model = "2diid", param = c(0.25, 0.025, 0.25, 0.025, 0, 0.4), 
+    n = nrow(BivMetaAnalysis)) 
+
+res <- inla(
+  formula = frm, 
+  data = BivMetaAnalysis, 
+  family = "binomial",
+  Ntrials = N, 
+  verbose = !TRUE
+)
+```
+
+Note that the first two elements of ther argument `param` (in the `f()` call) specify the shape and rate parameters for the log gamma prior for the first log precision, the second two for the second log precision, and the third two for the normal prior of the Fisher-transformed correlation parameter. 
+We can get (rough) summary estimates for sensitivity and specificity by applying a backtransformation using the `invlogit()` function.
+
+```{r}
+invlogit <- function(x) { 1 / (1 + exp(-x)) }
+
+res$summary.fixed[, c("mode", "0.025quant", "0.975quant")] |>
+  mutate(across(everything(), \(x) round(invlogit(x), 3)))
+```
+
+We can also fit the model using the Wishart prior for the precision matrix.
+
+```{r}
+N2 <- dim(BivMetaAnalysis)[1]
+BivMetaAnalysis_Wishart <- rbind(
+  BivMetaAnalysis[seq(1, N2, by = 2), ], 
+  BivMetaAnalysis[seq(2, N2, by = 2),]
+)
+BivMetaAnalysis_Wishart$diid <- 1:N2  # use a new index
+
+frm_wish <- Y ~ -1 + lag.tp + lag.tn + ct.tp + ct.tn + mr.tp + mr.tn +
+  f(diid, model = "iid2d", n = N2, hyper = list(
+    prec1 = list(prior = "wishart2d", param = c(4, 1, 2, 0.1))
+  ))
+res_wish <- inla(
+  formula = frm_wish, 
+  family = "binomial", 
+  data = BivMetaAnalysis_Wishart, 
+  Ntrials = N, 
+  verbose = !TRUE
+)
+
+res_wish$summary.fixed[, c("mode", "0.025quant", "0.975quant")] |>
+  mutate(across(everything(), \(x) round(invlogit(x), 3)))
+```
+
+The INLA fit for the bivariate meta-analysis of diagnostic accuracy shows results consistent with the expected trade-off between sensitivity and specificity across imaging modalities.
+For lymphangiography (LAG), sensitivity is moderate (≈0.69) and specificity fairly high (≈0.83), indicating that LAG detects a reasonable number of true positives while keeping false positives relatively low. 
+Computed tomography (CT) shows lower sensitivity (≈0.49) but excellent specificity (≈0.93), suggesting that CT misses more true cases but rarely misclassifies healthy individuals as diseased. 
+Magnetic resonance (MR) achieves slightly better sensitivity (≈0.55) and the highest specificity (≈0.95), reflecting strong ability to rule out disease.
+
+Overall, the bivariate INLA model successfully captures between-study variability and the correlation structure between sensitivity and specificity. 
+The posterior estimates imply that while all three imaging techniques are highly specific, LAG offers a better balance between sensitivity and specificity, whereas CT and MR favour specificity at the expense of sensitivity,
+This is a pattern typical in diagnostic meta-analysis.
+
+## References
+

@@ -1,0 +1,930 @@
+---
+title: "INLA Example: Joint Models for Longitudinal and Spatial Event-Time Data"
+author: "Taban Baghfalaki, Mojtaba Ganjali, Rui Martins"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    highlight: tango
+  word_document:
+    toc: true
+  pdf_document:
+    toc: true
+---
+
+## Example Description
+
+This example demonstrates how to fit a **Spatial joint modeling** using the `INLA` package in R version 4.5.1.  
+We illustrate the workflow using a subset of a real Brazil HIV dataset and analyze the posterior estimates.
+
+- **Goal:** Demonstrate INLA syntax and workflow  
+- **Model type:** Shared parameter model  
+- **Tags:** `Longitudinal data`, `Survival data`, `Joint modeling`, `Spatial Effect`, `Bayesian`, `INLA`
+
+---
+
+### Load necessary libraries for statistical modeling, spatial analysis, and visualization
+
+```r
+# Clear the workspace
+rm(list = ls())
+
+# Set working directory
+setwd("C:/Users/p80744tb/Desktop/ASJM-main/Baghfalaki_et_al")
+
+# --- Libraries for Bayesian inference and statistical modeling ---
+library(mvtnorm)       # Multivariate normal distributions
+library(INLA)          # Integrated Nested Laplace Approximations
+library(extraDistr)    # Additional probability distributions
+library(cplm)          # Compound Poisson GLM
+library(survival)      # Survival analysis
+library(CorrMixed)     # Mixed model correlation functions
+
+# --- Libraries for spatial epidemiology and spatial statistics ---
+library(SpatialEpi)    # Spatial epidemiology methods
+library(spdep)         # Spatial dependence (e.g., poly2nb)
+
+# --- Libraries for visualization ---
+library(ggplot2)       # Data visualization
+library(viridis)       # Color scales
+library(gridExtra)     # Arranging multiple plots
+
+# --- Notes ---
+# Ensure all packages are installed before running:
+# install.packages(c("mvtnorm", "INLA", "extraDistr", "cplm", 
+#                    "survival", "CorrMixed", "SpatialEpi", 
+#                    "spdep", "ggplot2", "viridis", "gridExtra"))
+```
+
+## Data Description
+
+The full dataset is described in Baghfalaki et al. (2025).
+In this document, we present only a subset of the data for illustration purposes. The available data include longitudinal measurements of CD4 cell counts for individuals living with HIV, as well as corresponding survival outcomes (time-to-event data).
+
+### Longitudinal data (`longHIV`)
+Each patient has repeated measurements of CD4 counts over time. The variables include:
+  
+  
+- **ID**: Patient identifier
+- **TIME**: Measurement time (in years)
+- **CD4**: Observed CD4 cell count (square-root transformed in the analysis)
+- **Gender**: Patient gender
+- **Age**: Patient age
+- **POI**: Previous opportunistic infection (study-specific variable)
+
+
+### Survival data (`survHIV`)
+
+
+Each patient has associated survival information. The variables include:
+
+
+- **ID**: Patient identifier
+- **ZONE_CODE**: Study zone or location code
+- **SURVTIME**: Survival or censoring time (in years)
+- **CENSOR**: Event indicator (1 = event occurred, 0 = censored)
+- **Gender**: Patient gender
+- **Age**: Patient age
+- **POI**: Previous opportunistic infection (study-specific variable)
+
+### Overview
+
+
+To provide an overview of the data, we visualize two aspects:
+
+
+1. **Spaghetti Plot of CD4 counts** – shows individual patient trajectories of CD4 measurements over time.
+2. **Kaplan–Meier Survival Curve** – illustrates the estimated survival probability as a function of time, with 95% confidence intervals.
+
+
+These plots highlight the heterogeneity across patients in both disease progression (CD4 dynamics) and survival outcomes.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(ggplot2)
+library(survival)
+library(survminer)
+```
+
+
+```r
+# Load data
+load("longHIV.rda")
+load("survHIV.rda")
+
+# --- Spaghetti plot of CD4 measurements over time ---
+Spaghetti.Plot(
+  Dataset   = longHIV,
+  Outcome   = CD4,
+  Id        = ID,
+  Time      = TIME,
+  Add.Mean  = FALSE,
+  Add.Median = FALSE,
+  Col       = "blue",
+  xlab      = "Time (Years)",
+  ylab      = expression(sqrt(CD4))
+)
+
+# --- Kaplan-Meier survival curve ---
+km_fit <- survfit(Surv(SURVTIME, CENSOR) ~ 1, data = survHIV)
+
+# Convert survival fit object into a data frame for ggplot
+km_data <- data.frame(
+  time  = km_fit$time,
+  surv  = km_fit$surv,
+  lower = km_fit$lower,
+  upper = km_fit$upper
+)
+
+# Plot with ggplot2
+ggplot(km_data, aes(x = time, y = surv)) +
+  geom_step(color = "blue", linewidth = 1) +  # Main survival curve
+  geom_ribbon(
+    aes(ymin = lower, ymax = upper),
+    fill = "blue", alpha = 0.25
+  ) +
+  labs(
+    title = "Kaplan-Meier Survival Curve",
+    x = "Time (Years)",
+    y = "Survival Probability"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+
+```
+
+
+### Map
+
+The spatial data is for Brazil, representing its geographic regions or states. Each polygon corresponds to a specific region, and the dataset can be used to analyze spatial patterns or dependencies, such as regional variations in health outcomes, socio-economic indicators, or disease prevalence. 
+
+We create a neighborhood structure based on shared boundaries between regions, which allows for spatial modeling using techniques like conditional autoregressive (CAR) models in INLA. The adjacency matrix derived from this structure encodes which regions are considered neighbors and is essential for capturing spatial dependencies in statistical analyses.
+
+
+```r
+# Load required libraries
+library(sf)        # For handling shapefiles
+library(spdep)     # For spatial neighbors and adjacency matrices
+library(INLA)      # For Bayesian spatial modeling
+
+# 1. Read shapefile of Brazil
+Fox_Lattice <- sf::st_read("Map/Brasil.shp")
+
+# 2. Plot the polygons to inspect the spatial data
+plot(Fox_Lattice$geometry, main = "Brazil Regions")
+
+# 3. Create a neighborhood list based on polygon contiguity
+Lattice_Temp <- spdep::poly2nb(Fox_Lattice)
+
+# 4. Convert the neighbor list to INLA adjacency format
+spdep::nb2INLA("Lattice.graph", Lattice_Temp)
+
+# 5. Set the location of the adjacency file for INLA
+Lattice.adj <- file.path(getwd(), "Lattice.graph")
+
+# 6. Configure INLA to disable default scaling
+inla.setOption(scale.model.default = FALSE)
+
+# 7. Load adjacency matrix as a graph for INLA spatial models
+H <- inla.read.graph(filename = Lattice.adj)
+
+# 8. Visualize the adjacency matrix
+image(inla.graph2matrix(H), 
+      xlab = "Region", 
+      ylab = "Region", 
+      main = "Spatial Adjacency Matrix")
+```
+
+---
+
+## Model Specification and Fitting
+
+We fit a **joint longitudinal-survival model** using `inla()` with a Gaussian likelihood for the longitudinal CD4 counts and a Weibull likelihood for the survival times.  
+
+The **longitudinal component** is specified as:
+
+\[
+Y_{ikj} = \beta_0 + \beta_1 \text{Age}_{ik} + \beta_2 \text{Gender}_{ik} + \beta_3 \text{PrevOI}_{ik} + g(s_{ikj}) + u_{ik0} + u_{ik1} s_{ikj} + \epsilon_{ikj},
+\]
+
+where:  
+- \(Y_{ikj}\) is the CD4 count for patient \(i\) in cluster \(k\) at time \(s_{ikj}\),  
+- \(\beta_0, \beta_1, \beta_2, \beta_3\) are fixed effect coefficients,  
+- \(g(s_{ikj})\) is a spline function capturing nonlinear temporal trends,  
+- \(u_{ik0}, u_{ik1}\) are patient-specific random intercept and slope,  
+- \(\epsilon_{ikj}\) is the residual error.
+
+The **survival component** is modeled as:
+
+\[
+h(t_{ik}) = h_0(t_{ik}) \exp\Big(\alpha_0 + \alpha_1 \text{Age}_{ik} + \alpha_2 \text{Gender}_{ik} + \alpha_3 \text{PrevOI}_{ik} + \gamma_1 u_{ik0} + \gamma_2 u_{ik1} + \nu_k \Big),
+\]
+
+where:  
+- \(h(t_{ik})\) is the hazard for patient \(i\) in cluster \(k\),  
+- \(h_0(t_{ik})\) is the baseline hazard (Weibull),  
+- \(\alpha_0, \alpha_1, \alpha_2, \alpha_3\) are survival fixed effects,  
+- \(\gamma_1, \gamma_2\) link the longitudinal random effects to the survival model,  
+- \(\nu_k\) is a spatial or cluster-specific random effect.
+
+This formulation allows **sharing information between the longitudinal and survival processes** through the random effects \(b_{ik0}, b_{ik1}\) and captures **spatial dependencies** via \(\nu_k\).  
+
+The model is implemented in R using the `inla()` function, where the longitudinal and survival outcomes are combined into a single joint dataset, and spatial effects are specified using a Besag model with the adjacency graph.
+
+
+```r
+# ------------------------------------------------------------
+# Initialize empty lists to store joint, longitudinal, and survival data
+# ------------------------------------------------------------
+# n1: number of longitudinal observations (CD4 measurements)
+# n2: number of survival observations (time-to-event data)
+n1 <- length(longHIV$ID)
+n2 <- length(survHIV$ID)
+
+# ------------------------------------------------------------
+# Prepare joint data objects for longitudinal and survival analysis
+# ------------------------------------------------------------
+# y.long: longitudinal outcome (CD4 count)
+# y.surv: survival outcome, with NA placeholders for longitudinal rows
+# Yjoint: combined list of longitudinal and survival outcomes for INLA
+y.long <- c(longHIV$CD4) # Extract longitudinal outcome (CD4 count)
+y.surv <- inla.surv(time = c(rep(NA, n1), survHIV$SURVTIME), 
+                     event = c(rep(NA, n1), survHIV$CENSOR)) # Define survival data for INLA
+Yjoint <- list(y.long, y.surv) # Combine longitudinal and survival outcomes
+
+# ------------------------------------------------------------
+# Define linear covariates for joint model
+# ------------------------------------------------------------
+# Linear covariates include age, gender, and previous opportunistic infection (POI)
+# Covariates are zero-padded for the component (longitudinal or survival) they do not belong to
+linear.covariate <- data.frame(
+  mu = as.factor(c(rep(1, n1), rep(2, n2))), # Indicator for model component (1=longitudinal, 2=survival)
+  l.TIME = c(longHIV$TIME, rep(0, n2)),      # Longitudinal time variable
+  l.Age = c(longHIV$Age, rep(0, n2)),        # Age for longitudinal part
+  l.Gender = c(longHIV$Gender, rep(0, n2)),  # Gender for longitudinal part
+  l.POI = c(longHIV$POI, rep(0, n2)),        # Previous opportunistic infection for longitudinal part
+  s.Age = c(rep(0, n1), survHIV$Age),        # Age for survival part
+  s.Gender = c(rep(0, n1), survHIV$Gender),  # Gender for survival part
+  s.POI = c(rep(0, n1), survHIV$POI)         # Previous opportunistic infection for survival part
+)
+
+# ------------------------------------------------------------
+# Extend spline basis matrix for longitudinal model
+# ------------------------------------------------------------
+# B-spline basis is used to model nonlinear temporal trends in CD4 counts
+# Zero-padding is added for survival rows
+Spline_Basis <- bsp(longHIV$TIME, k = 5)$Z  # Generate B-spline basis with 5 knots
+Spline_Basis0 <- matrix(0, n2, dim(Spline_Basis)[2])
+linear.covariate$l.SS <- rbind(Spline_Basis, Spline_Basis0) # Combine longitudinal splines and zero-padded splines for survival
+
+# ------------------------------------------------------------
+# Define random covariates for joint model
+# ------------------------------------------------------------
+# Random effects capture patient-level variability and spatial dependencies
+# U11/U21: random intercept and slope for longitudinal component
+# U12/U22: random intercept and slope for survival component
+# ZONE_CODE: spatial random effect for regional dependencies
+random.covariate <- list(
+  U11 = c(longHIV$ID, rep(NA, n2)),           # Random intercept for longitudinal
+  U21 = c(longHIV$ID + n2, rep(NA, n2)),      # Random slope for longitudinal
+  U12 = c(rep(NA, n1), 1:n2),                 # Random intercept for survival
+  U22 = c(rep(NA, n1), n2 + (1:n2)),          # Random slope for survival
+  ZONE_CODE = c(rep(NA, n1), survHIV$ZONE_CODE) # Spatial random effect (region-based)
+)
+
+# ------------------------------------------------------------
+# Combine linear and random covariates, and outcome data for INLA modeling
+# ------------------------------------------------------------
+joint.data <- c(linear.covariate, random.covariate)
+joint.data$Y <- Yjoint
+
+# ------------------------------------------------------------
+# Define the joint model formula with fixed effects, random effects, and spatial effects
+# ------------------------------------------------------------
+# Formula includes:
+# - Fixed effects: demographic covariates and spline basis for longitudinal time
+# - Random effects: intercepts/slopes for longitudinal and survival components
+# - Spatial effect: Besag model using adjacency graph with penalized complexity prior
+formula <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model = "iid2d", n = 2 * n2) +       # Random intercept for longitudinal component
+  f(U21, l.TIME, copy = "U11") +              # Random slope for longitudinal, copying structure of U11
+  f(U12, copy = "U11", fixed = FALSE) +       # Random intercept for survival, unlinked from longitudinal
+  f(U22, copy = "U11", fixed = FALSE) +       # Random slope for survival, unlinked from longitudinal
+  f(ZONE_CODE, model = "besag", graph = Lattice.adj, # Spatial effect using Besag model
+    hyper = list(prec = list(prior = "pc.prec", param = c(1, 0.1)))) # Penalized complexity prior
+
+
+# ------------------------------------------------------------
+# Record start time to measure model execution duration
+# ------------------------------------------------------------
+start_time0 <- proc.time()
+
+# ------------------------------------------------------------
+# Fit joint model using INLA
+# ------------------------------------------------------------
+# Gaussian family for longitudinal outcome (CD4 counts)
+# Weibull survival family for time-to-event outcome
+# Model evaluation metrics (DIC, WAIC, CPO) are computed
+joint.inla <- inla(formula,
+                   family = c("gaussian", "weibullsurv"),
+                   data = joint.data,
+                   control.compute = list(dic = TRUE, waic = TRUE, cpo = TRUE),
+                   control.family = list(list(), list())
+)
+
+# ------------------------------------------------------------
+# Print summary of the INLA model results
+# ------------------------------------------------------------
+summary(joint.inla)
+
+```
+
+---
+
+### Posterior Results and Summary
+
+We summarize the fixed effects, hyperparameters, and model fit metrics, and visualize the posterior estimates.
+
+```r
+# ------------------------------------------------------------
+# Extracting Model Results and Evaluating Model Fit
+# ------------------------------------------------------------
+
+# 1. Fixed Effects Estimates
+# --------------------------
+# Posterior means of fixed effect coefficients (e.g., Age, Gender, PrevOI, spline terms)
+fixed_effects_means <- joint.inla$summary.fixed[, 1] 
+
+# 95% credible intervals for the fixed effect estimates
+fixed_effects_CI <- joint.inla$summary.fixed[, c(3, 5)]
+
+# 2. Hyperparameters (Random Effects Variance)
+# ---------------------------------------------
+# Posterior means of hyperparameters (e.g., variances of random intercepts, slopes, and spatial effects)
+hyperpar_means <- joint.inla$summary.hyperpar[, 1] 
+
+# 95% credible intervals for hyperparameters
+hyperpar_CI <- joint.inla$summary.hyperpar[, c(3, 5)]
+
+
+# ------------------------------------------------------------
+# Extract Posterior Summaries for Fixed Effects
+# ------------------------------------------------------------
+# 'mean' gives the posterior mean (point estimate) of each fixed effect
+# '0.025quant' and '0.975quant' provide the lower and upper bounds of the 95% credible interval
+fixed_effects_summary <- joint.inla$summary.fixed[, c("mean", "0.025quant", "0.975quant")]
+
+# View the posterior summary for fixed effects
+fixed_effects_summary
+
+
+# 3. Log Pseudo-Marginal Likelihood (LPML)
+# -----------------------------------------
+# LPML is a leave-one-out cross-validation metric for model comparison
+LPML1 <- sum(log(joint.inla$cpo$cpo))
+
+# 4. Model Quality Metrics
+# ------------------------
+# WAIC: Widely Applicable Information Criterion
+waic_value <- joint.inla$waic$waic
+
+# DIC: Deviance Information Criterion
+dic_value <- joint.inla$dic$dic
+
+
+# Optional: Print summaries
+fixed_effects_means
+fixed_effects_CI
+hyperpar_means
+hyperpar_CI
+LPML1
+waic_value
+dic_value
+
+```
+
+### Interpretation of Results
+
+| Parameter    | Mean   | 95% Credible Interval | Interpretation                                                                                                                           |
+| ------------ | ------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **mu1**      | 9.04   | 6.34 – 11.75          | Intercept for the longitudinal component (CD4 counts). Average CD4 at baseline for reference patient.                                    |
+| **mu2**      | -4.69  | -6.54 – -3.53         | Intercept for the survival component (log-hazard scale). Negative value indicates lower baseline hazard compared to reference.           |
+| **l.Age**    | -0.83  | -1.50 – -0.17         | Age effect on CD4 counts: older patients tend to have lower longitudinal CD4 values. Credible interval does not include 0 → significant. |
+| **l.Gender** | -0.84  | -2.19 – 0.50          | Gender effect on CD4 counts: slight decrease in CD4 for one gender, but CI includes 0 → not statistically significant.                   |
+| **l.POI**    | -2.14  | -3.49 – -0.78         | Previous opportunistic infection significantly reduces CD4 counts. CI excludes 0 → strong effect.                                        |
+| **l.SS1**    | -36.84 | -48.63 – -25.04       | Spline coefficient capturing nonlinear temporal effect of CD4; strong negative trend at this part of the spline.                         |
+| **l.SS2**    | 12.08  | 5.53 – 18.63          | Spline coefficient: positive contribution to nonlinear temporal trend of CD4.                                                            |
+| **l.SS3**    | -46.20 | -59.68 – -32.71       | Spline coefficient: negative contribution to CD4 trajectory, reflecting decreasing trend at this period.                                 |
+| **s.Age**    | 0.41   | -0.01 – 0.83          | Age effect on survival: slightly higher hazard with age, but CI marginally includes 0 → borderline significance.                         |
+| **s.Gender** | -0.11  | -1.16 – 0.95          | Gender effect on survival: CI includes 0 → not statistically significant.                                                                |
+| **s.POI**    | 1.00   | -0.11 – 2.11          | Previous opportunistic infection effect on survival: positive estimate suggests higher hazard, but CI includes 0 → weak evidence.        |
+
+
+---
+
+### Spatial Mapping of Random Effects and Linear Predictor
+
+This section visualizes the spatial random effects (`ZONE_CODE`) and aggregated predictions from the joint model across Brazil.
+
+```r 
+# Load required packages
+library(sf)          # For handling spatial shapefiles
+library(ggplot2)     # For plotting
+library(gridExtra)   # For arranging multiple plots
+library(viridis)     # Color scales for better visualization
+
+# Read the shapefile for Brazil (replace with your path)
+nc <- st_read("Map/Brasil.shp", quiet = TRUE)
+
+# -------------------------
+# 1. Spatial random effects
+# -------------------------
+# Exponentiate predicted values for the ZONE_CODE random effect
+v0 <- exp(joint.inla$summary.random$ZONE_CODE[, 2])
+
+# Create the first map
+p1 <- ggplot(nc) +
+  geom_sf(aes(fill = v0)) +
+  scale_fill_viridis(name = "Random Effect") +
+  theme_bw() +
+  theme(legend.title = element_text(size = 10),
+        legend.position = "right")
+
+# -------------------------
+# 2. Aggregated linear predictor
+# -------------------------
+# Aggregate predictions by zone
+v <- aggregate(joint.inla$summary.linear.predictor[(n1 + 1):(n1 + n2), 1] ~ survHIV$ZONE_CODE, FUN = mean)[, 2]
+
+# Prepare vector v1 to match all zones (with 27 zones as example)
+v1 <- rep(1, 27)
+v1[1:12] <- v[1:12]
+v1[15:27] <- v[13:25]
+v1[13:14] <- mean(v1[-c(13:14)])  # Impute mean for missing zones
+
+# Create the second map
+p2 <- ggplot(nc) +
+  geom_sf(aes(fill = exp(v1))) +
+  scale_fill_viridis(name = "Predicted Hazard") +
+  theme_bw() +
+  theme(legend.title = element_text(size = 10),
+        legend.position = "right")
+
+# -------------------------
+# 3. Arrange plots side by side
+# -------------------------
+grid.arrange(p2, p1, ncol = 2)
+```
+
+### Cox-Snell Residuals and Hazard Function Simulation
+
+This section demonstrates how to simulate random effects, compute hazard rates for each patient, and assess model fit using Cox-Snell residuals.
+
+```r
+# -------------------------------
+# 1. Setup and Random Effects Simulation
+# -------------------------------
+set.seed(12345)
+
+# Extract hyperparameters from the joint INLA model
+r1 <- joint.inla$summary.hyperpar$mean[7]  # Random effect 1
+r2 <- joint.inla$summary.hyperpar$mean[8]  # Random effect 2
+
+# Construct covariance matrix for longitudinal random effects
+D <- matrix(
+  c(
+    joint.inla$summary.hyperpar$mean[3]^-1,
+    joint.inla$summary.hyperpar$mean[3]^-1 * joint.inla$summary.hyperpar$mean[5]^-1 * joint.inla$summary.hyperpar$mean[4],
+    joint.inla$summary.hyperpar$mean[3]^-1 * joint.inla$summary.hyperpar$mean[5]^-1 * joint.inla$summary.hyperpar$mean[4],
+    joint.inla$summary.hyperpar$mean[4]^-1
+  ),
+  2, 2
+)
+
+# Extract variance hyperparameter
+r <- joint.inla$summary.hyperpar$mean[2]
+
+# Regularize the covariance matrix
+a <- 0.01
+D1 <- a * diag(2) + (1 - a) * D
+
+# Simulate random effects for patients
+b <- rmvnorm(n2, rep(0, 2), D1)
+
+# -------------------------------
+# 2. Spatial Random Effects
+# -------------------------------
+tau <- joint.inla$summary.hyperpar$mean[5]  # Variance hyperparameter
+Q <- matrix(tau, H$n, H$n)
+
+# Adjust diagonal based on neighborhood structure
+for (kk in 1:H$n) {
+  Q[kk, kk] <- tau * (H$nnbs[kk])
+}
+
+# Regularize and simulate spatial effects
+Q1 <- a * diag(H$n) + (1 - a) * Q
+u <- rmvnorm(1, rep(0, H$n), solve(Q1))
+
+# -------------------------------
+# 3. Compute Patient-Specific Hazard Rates
+# -------------------------------
+lambda <- numeric(n2)
+
+for (patientnr in 1:n2) {
+  # Covariate vector for survival component
+  X <- c(1, linear.covariate$s.Age[n1 + patientnr],
+            linear.covariate$s.Gender[n1 + patientnr],
+            linear.covariate$s.POI[n1 + patientnr])
+  
+  llll <- length(joint.inla$summary.fixed$mean)
+  
+  # Compute hazard: fixed effects + random effects + spatial effect
+  lambda[patientnr] <- c(joint.inla$summary.fixed$mean[2], 
+                         joint.inla$summary.fixed$mean[(llll - 2):llll]) %*% X +
+                       r1 * b[patientnr, 1] +
+                       r2 * b[patientnr, 2] +
+                       u[survHIV$ZONE_CODE[patientnr]]
+}
+
+# -------------------------------
+# 4. Cox-Snell Residuals and Kaplan-Meier Plot
+# -------------------------------
+# Compute survival probabilities (Weibull)
+surv2 <- 1 - pweibull(survHIV$SURVTIME, r, exp(-lambda / r))
+
+# Cox-Snell residuals
+res.coxsnell <- -log(surv2)
+
+# Kaplan-Meier fit
+km <- survfit(Surv(res.coxsnell, survHIV$CENSOR, type = 'right') ~ 1)
+
+# Plot KM survival function of residuals
+plot(
+  km,
+  xlab = "Cox-Snell Residuals",
+  xlim = c(0, 1.2),
+  main = "Survival Function of Cox-Snell Residuals",
+  mark.time = FALSE,
+  conf.int = FALSE,
+  lwd = 2
+)
+
+# Add reference line for exponential distribution
+x <- seq(0, 10, 0.01)
+lines(x, 1 - pexp(x), lwd = 1, lty = 2)
+```
+### Predicted Trajectories and Survival Curves
+
+This section demonstrates how to visualize the predicted longitudinal CD4 trajectories 
+and individual survival probabilities for selected patients based on the fitted joint 
+longitudinal-survival model. It overlays observed CD4 counts with model predictions 
+and generates patient-specific survival curves using the estimated model parameters.
+
+
+```r
+# Extract predicted values from the model
+predl = joint.inla$summary.fitted.values$mean[1:n1]             # Longitudinal predictions for all measurements
+preds = joint.inla$summary.fitted.values$mean[(1+n1):(n2+n1)]  # Survival predictions for all patients
+
+# Initialize a matrix to store predictions for each patient
+predL = matrix(NA, n2, 17)  # 17 columns assumed as maximum number of repeated measures per patient
+
+# Populate the prediction matrix based on patient IDs
+r = 0
+for (k in unique(longHIV$ID)) {
+  r = r + 1
+  predL[r, 1:length(longHIV$CD4[longHIV$ID == k])] = predl[longHIV$ID == k]
+}
+
+# Define specific patients to plot
+patients = c(1, 12, 32)
+
+# Set up a custom plotting layout: 3 rows, 2 columns (first column wider)
+layout(matrix(1:6, nrow = 3, ncol = 2, byrow = TRUE), widths = c(2, 1)) 
+
+# Adjust margins for each plot (bottom, left, top, right)
+par(mar = c(2, 4, 2, 1))  
+
+# Extract hyperparameter estimates
+alpha = joint.inla$summary.hyperpar$mean[1]      # First hyperparameter
+j_est = joint.inla$summary.hyperpar$mean[2:6]   # Other hyperparameters
+f_est = joint.inla$summary.fixed$mean           # Fixed effect estimates
+
+# Loop through each selected patient to generate plots
+for (i in 1:length(patients)) {
+  patientnr = patients[i]
+  dataHi = longHIV[longHIV$ID == patientnr,]
+  
+  # Plot observed CD4 trajectory
+  plot(dataHi$TIME, dataHi$CD4,
+       ylab = "CD4 count", 
+       xlab = "Time (months)", 
+       type = "l",
+       xlim = c(0, 5), 
+       ylim = c(0, 45),
+       main = paste("CD4 trajectory - patient", patientnr))
+  
+  # Overlay model predictions
+  lines(dataHi$TIME, predL[patientnr, 1:dim(dataHi)[1]], col = "blue", lty = 2)
+  
+  # Add legend only for the first patient
+  if (i == 1) {
+    legend("topright", c("Observed", "Prediction"), lty = 1:2, col = c(1, "blue"), bty = "n")
+  }
+  
+  # Calculate lambda for survival curve
+  r = joint.inla$summary.hyperpar$mean[2]
+  X = c(1, linear.covariate$s.Age[n1 + patientnr], 
+        linear.covariate$s.Gender[n1 + patientnr], 
+        linear.covariate$s.POI[n1 + patientnr])
+  
+  llll = length(joint.inla$summary.fixed$mean)
+  lambda = c(joint.inla$summary.fixed$mean[2], 
+             joint.inla$summary.fixed$mean[(llll - 2):llll]) %*% X
+  
+  # Generate survival curve over time
+  pred_time = seq(0, 5, by = 0.01)
+  bbbb = (as.numeric(pred_time) / as.numeric(-lambda))^r
+  
+  # Plot survival probability
+  plot(pred_time, exp(-bbbb),
+       type = "l", 
+       ylab = "Survival probability", 
+       xlab = "Time (months)",
+       main = paste("Survival curve - patient", patientnr))
+  
+  # Add horizontal line at 50% survival
+  abline(h = 0.5, col = "red")
+}
+```
+
+
+---
+
+## Other Competing Joint Models
+
+Here, we consider 12 competing joint models that differ in their specifications of random effects for the longitudinal sub-model, the associated effects on the survival sub-model, and the inclusion or exclusion of spatial effects. Some models include only longitudinal random effects, some incorporate survival-related random effects, and others account for spatial correlation, allowing a comprehensive comparison of model structures.
+
+```r
+library(INLA)
+library(xtable)
+
+# -----------------------------------------------
+# 1. Full model with longitudinal, survival, and spatial effects
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = gamma1*u_{ik0} + gamma2*u_{ik1}
+# spatial = nu_k
+formula_full <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model="iid2d", n=2*n2) +
+  f(U21, l.TIME, copy="U11") +
+  f(U12, copy="U11", fixed=FALSE) +
+  f(U22, copy="U11", fixed=FALSE) +
+  f(ZONE_CODE, model="besag", graph=Lattice.adj,
+    hyper=list(prec=list(prior="pc.prec", param=c(0.1,0.1))))
+
+joint_full <- inla(formula_full,
+                   family=c("gaussian","weibullsurv"),
+                   data=joint.data,
+                   control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                   control.family=list(list(), list()))
+summary(joint_full)
+LPML_full <- sum(log(joint_full$cpo$cpo))
+joint_full$waic$waic
+joint_full$dic$dic
+
+# -----------------------------------------------
+# 2. Longitudinal + survival random effects only, no spatial
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = gamma1*u_{ik0} + gamma2*u_{ik1}
+# spatial = 0
+formula_noSpatial <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model="iid2d", n=2*n2) +
+  f(U21, l.TIME, copy="U11") +
+  f(U12, copy="U11", fixed=FALSE) +
+  f(U22, copy="U11", fixed=FALSE)
+
+joint_noSpatial <- inla(formula_noSpatial,
+                        family=c("gaussian","weibullsurv"),
+                        data=joint.data,
+                        control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                        control.family=list(list(), list()))
+summary(joint_noSpatial)
+LPML_noSpatial <- sum(log(joint_noSpatial$cpo$cpo))
+joint_noSpatial$waic$waic
+joint_noSpatial$dic$dic
+
+# -----------------------------------------------
+# 3. Longitudinal random effects + spatial only (no survival random effects)
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = 0
+# spatial = nu_k
+formula_longitudinalSpatial <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model="iid2d", n=2*n2) +
+  f(U21, l.TIME, copy="U11") +
+  f(ZONE_CODE, model="besag", graph=Lattice.adj,
+    hyper=list(prec=list(prior="pc.prec", param=c(0.1,0.1))))
+
+joint_longitudinalSpatial <- inla(formula_longitudinalSpatial,
+                                  family=c("gaussian","weibullsurv"),
+                                  data=joint.data,
+                                  control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                                  control.family=list(list(), list()))
+summary(joint_longitudinalSpatial)
+LPML_longitudinalSpatial <- sum(log(joint_longitudinalSpatial$cpo$cpo))
+joint_longitudinalSpatial$waic$waic
+joint_longitudinalSpatial$dic$dic
+
+# -----------------------------------------------
+# 4. Fixed-effects only model (no random effects)
+# longitudinal = 0
+# survival = 0
+# spatial = 0
+formula_fixed <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI
+
+joint_fixed <- inla(formula_fixed,
+                    family=c("gaussian","weibullsurv"),
+                    data=joint.data,
+                    control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                    control.family=list(list(), list()))
+summary(joint_fixed)
+LPML_fixed <- sum(log(joint_fixed$cpo$cpo))
+joint_fixed$waic$waic
+joint_fixed$dic$dic
+
+# -----------------------------------------------
+# 5. Longitudinal random intercept only
+# longitudinal = u_{ik0}
+# survival = 0
+# spatial = 0
+formula_u0 <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11)
+
+joint_u0 <- inla(formula_u0,
+                 family=c("gaussian","weibullsurv"),
+                 data=joint.data,
+                 control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                 control.family=list(list(), list()))
+summary(joint_u0)
+LPML_u0 <- sum(log(joint_u0$cpo$cpo))
+joint_u0$waic$waic
+joint_u0$dic$dic
+
+# -----------------------------------------------
+# 6. Longitudinal random effects + survival random effect u_{ik0} only
+# longitudinal = u_{ik0}
+# survival = gamma1*u_{ik0}
+# spatial = 0
+formula_u0_surv <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11) +
+  f(U12, copy="U11", fixed=FALSE)
+
+joint_u0_surv <- inla(formula_u0_surv,
+                      family=c("gaussian","weibullsurv"),
+                      data=joint.data,
+                      control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                      control.family=list(list(), list()))
+summary(joint_u0_surv)
+LPML_u0_surv <- sum(log(joint_u0_surv$cpo$cpo))
+joint_u0_surv$waic$waic
+joint_u0_surv$dic$dic
+
+# -----------------------------------------------
+# 7. Longitudinal + survival u0 only + spatial
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = gamma1*u_{ik0}
+# spatial = nu_k
+formula_u0_surv_spatial <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model="iid2d", n=2*n2) +
+  f(U21, l.TIME, copy="U11") +
+  f(U12, copy="U11", fixed=FALSE) +
+  f(ZONE_CODE, model="besag", graph=Lattice.adj,
+    hyper=list(prec=list(prior="pc.prec", param=c(0.1,0.1))))
+
+joint_u0_surv_spatial <- inla(formula_u0_surv_spatial,
+                              family=c("gaussian","weibullsurv"),
+                              data=joint.data,
+                              control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                              control.family=list(list(), list()))
+summary(joint_u0_surv_spatial)
+LPML_u0_surv_spatial <- sum(log(joint_u0_surv_spatial$cpo$cpo))
+joint_u0_surv_spatial$waic$waic
+joint_u0_surv_spatial$dic$dic
+
+# -----------------------------------------------
+# 8. Longitudinal + survival u1 only + spatial
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = gamma2*u_{ik1}
+# spatial = nu_k
+formula_u1_surv_spatial <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model="iid2d", n=2*n2) +
+  f(U21, l.TIME, copy="U11") +
+  f(U22, copy="U11", fixed=FALSE) +
+  f(ZONE_CODE, model="besag", graph=Lattice.adj,
+    hyper=list(prec=list(prior="pc.prec", param=c(0.1,0.1))))
+
+joint_u1_surv_spatial <- inla(formula_u1_surv_spatial,
+                              family=c("gaussian","weibullsurv"),
+                              data=joint.data,
+                              control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                              control.family=list(list(), list()))
+summary(joint_u1_surv_spatial)
+LPML_u1_surv_spatial <- sum(log(joint_u1_surv_spatial$cpo$cpo))
+joint_u1_surv_spatial$waic$waic
+joint_u1_surv_spatial$dic$dic
+
+# -----------------------------------------------
+# 9. Longitudinal + survival + spatial (full RE u0+u1, survival u0+u1, spatial)
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = gamma1*u_{ik0} + gamma2*u_{ik1}
+# spatial = nu_k
+formula_full2 <- formula_full # same as model 1
+joint_full2 <- joint_full
+LPML_full2 <- LPML_full
+joint_full2$waic$waic
+joint_full2$dic$dic
+
+# -----------------------------------------------
+# 10. Longitudinal + survival only (u0+u1), no spatial
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = gamma1*u_{ik0} + gamma2*u_{ik1}
+# spatial = 0
+formula_noSpatial2 <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model="iid2d", n=2*n2) +
+  f(U21, l.TIME, copy="U11") +
+  f(U12, copy="U11", fixed=FALSE) +
+  f(U22, copy="U11", fixed=FALSE)
+joint_noSpatial2 <- inla(formula_noSpatial2,
+                        family=c("gaussian","weibullsurv"),
+                        data=joint.data,
+                        control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                        control.family=list(list(), list()))
+summary(joint_noSpatial2)
+LPML_noSpatial2 <- sum(log(joint_noSpatial2$cpo$cpo))
+joint_noSpatial2$waic$waic
+joint_noSpatial2$dic$dic
+
+# -----------------------------------------------
+# 11. Longitudinal + spatial only (u0+u1), survival = 0
+# longitudinal = u_{ik0} + u_{ik1} s_{ikj}
+# survival = 0
+# spatial = nu_k
+formula_long_spatial <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(U11, model="iid2d", n=2*n2) +
+  f(U21, l.TIME, copy="U11") +
+  f(ZONE_CODE, model="besag", graph=Lattice.adj,
+    hyper=list(prec=list(prior="pc.prec", param=c(0.1,0.1))))
+
+joint_long_spatial <- inla(formula_long_spatial,
+                           family=c("gaussian","weibullsurv"),
+                           data=joint.data,
+                           control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                           control.family=list(list(), list()))
+summary(joint_long_spatial)
+LPML_long_spatial <- sum(log(joint_long_spatial$cpo$cpo))
+joint_long_spatial$waic$waic
+joint_long_spatial$dic$dic
+
+# -----------------------------------------------
+# 12. Spatial-only model (nu_k)
+# longitudinal = 0
+# survival = 0
+# spatial = nu_k
+# -----------------------------------------------
+# 12. Spatial-only model
+# longitudinal = 0
+# survival = 0
+# spatial = nu_k
+formula_spatial_only <- Y ~ mu - 1 + l.Age + l.Gender + l.POI + l.SS + s.Age + s.Gender + s.POI +
+  f(ZONE_CODE, model="besag", graph=Lattice.adj,
+    hyper=list(prec=list(prior="pc.prec", param=c(0.1,0.1))))
+
+joint_spatial_only <- inla(formula_spatial_only,
+                           family=c("gaussian","weibullsurv"),
+                           data=joint.data,
+                           control.compute=list(dic=TRUE, waic=TRUE, cpo=TRUE),
+                           control.family=list(list(), list()))
+summary(joint_spatial_only)
+
+LPML_spatial_only <- sum(log(joint_spatial_only$cpo$cpo))
+joint_spatial_only$waic$waic
+joint_spatial_only$dic$dic
+```
+
+---
+
+## References
+
+- Baghfalaki, T., Ganjali, M., & Martins, R. (2025).  
+  *Approximate Bayesian inference for joint partially linear modeling of longitudinal measurements and spatial time-to-event data.* JSCS, 1-29.  [https://doi.org/10.1080/00949655.2025.2538116](https://doi.org/10.1080/00949655.2025.2538116) 
+- Source code available at: [https://github.com/tbaghfalaki/ASJM](https://github.com/tbaghfalaki/ASJM)
+
+
+
+

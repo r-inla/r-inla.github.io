@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INLA Citations Map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body {
+      background: linear-gradient(180deg, #f1faf8 0%, #ffffff 40%);
+      color: #0f2743;
+    }
+
+    .map-page-header {
+      text-align: center;
+      padding: 60px 20px 30px;
+    }
+
+    .map-page-header h1 {
+      font-size: 38px;
+      margin-bottom: 16px;
+    }
+
+    .map-page-header p {
+      font-size: 18px;
+      margin: 0 auto;
+      max-width: 760px;
+      line-height: 1.7;
+    }
+
+    .map-fullframe {
+      width: min(95%, 1300px);
+      height: 82vh;
+      min-height: 540px;
+      margin: 0 auto 50px;
+      border-radius: 20px;
+      box-shadow: 0 22px 46px rgba(15, 39, 67, 0.18);
+      border: 6px solid #bbcf32;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .map-fullframe iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .map-credit {
+      text-align: center;
+      font-size: 15px;
+      color: #3b5c70;
+      margin: 18px auto 32px;
+    }
+
+    .map-back {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .map-back a {
+      display: inline-block;
+      padding: 13px 30px;
+      background: #006d77;
+      color: #fff;
+      border-radius: 32px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .map-back a:hover {
+      background: #004f57;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+    }
+  </style>
+</head>
+<body>
+  <header class="map-page-header">
+    <h1>INLA Citations Around the Globe</h1>
+    <p>
+      This interactive map highlights institutions and research groups that cite INLA. Use the full-screen controls,
+      zoom, and markers to explore the geographic reach of the methodology.
+    </p>
+  </header>
+
+  <div class="map-fullframe">
+    <iframe src="inla_cited_by_map_.html" title="Institutions citing INLA" loading="lazy"
+            sandbox="allow-scripts allow-same-origin allow-popups allow-pointer-lock"></iframe>
+  </div>
+
+  <p class="map-credit">Curated by esmail@r-inla.org · Updated Nov 2025</p>
+
+  <div class="map-back">
+    <a href="../index.html">← Back to Home</a>
+  </div>
+</body>
+</html>

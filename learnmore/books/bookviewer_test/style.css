@@ -1,0 +1,71 @@
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  background-color: #ffffff;
+  color: #222;
+}
+
+.team-header {
+  text-align: center;
+  background-color: #006d77;
+  padding: 50px 20px;
+  border-bottom: 4px solid #bbcf32;
+  color: white;
+}
+
+.book-selector {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.book-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px;
+}
+
+.book-list li {
+  cursor: pointer;
+  padding: 12px;
+  margin: 8px 0;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.book-list li:hover {
+  background-color: #e0f7f5;
+}
+
+.book-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.book-display img {
+  width: 100%;
+  max-width: 300px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.book-display a {
+  font-weight: 600;
+  color: #006d77;
+  text-decoration: none;
+}
+
+.team-footer {
+  text-align: center;
+  padding: 20px;
+  background: #f0f0f0;
+  border-top: 1px solid #ddd;
+  font-size: 14px;
+}
+

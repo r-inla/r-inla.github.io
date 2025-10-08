@@ -9,28 +9,6 @@
 </head>
 <body>
 
-  <nav class="sidebar">
-    <ul>
-      <li><a href="../index.html">Home</a></li>
-      <li><a href="../whatisinla/index.html">What is INLA?</a></li>
-      <li><a href="#">Documentation</a></li>
-      <li><a href="../download/index.html">Download & Install</a></li>
-      <li><a href="#">Examples & Tutorials</a></li>
-      <li><a href="#">Update INLA</a></li>
-      <li><a href="../learnmore/index.html">Learn More</a></li>
-      <li><a href="../ourteam/index.html">Team</a></li>
-      <li><a href="#">News</a></li>
-      <li><a href="#">Discussion Group</a></li>
-      <li><a href="#">Internal Use</a></li>
-      <li><a href="#">FAQ</a></li>
-      <li><a href="../relatedprojects/index.html">Related Projects</a></li>
-      <li><a href="#">Contact Us</a></li>
-    </ul>
-  </nav>
-
-  <!-- NEW: wrapper that will shift everything on sidebar hover -->
-  <div class="main-content-wrapper">
-
     <header>
       <img class="curve-image" src="images/dens.jpg" alt="Gaussian Curves">
       <div class="logo-wrapper">
@@ -47,81 +25,109 @@
 
     <section id="main-options" class="buttons-grid">
       <!-- Introductory -->
-      <div class="button-box">
+      <a class="button-box" href="whatisinla/index.html">
         <div class="icon-circle">
           <img src="images/icon3.jpg" alt="INLA Info">
         </div>
-        <a href="whatisinla/index.html">What is INLA?</a>
-      </div>
-      <div class="button-box">
+        <span>What is INLA?</span>
+      </a>
+      <a class="button-box" href="learnmore/index.html">
         <div class="icon-circle">
           <img src="images/icon4.jpg" alt="Learn More">
         </div>
-        <a href="learnmore/index.html">Learn More</a>
-      </div>
+        <span>Learn More</span>
+      </a>
 
       <!-- Main Access -->
-      <div class="button-box">
+      <a class="button-box" href="papers/index.html">
         <div class="icon-circle">
           <img src="images/icon8.jpg" alt="Papers">
         </div>
-        <a href="papers/index.html">Papers</a>
-      </div>
-      <div class="button-box">
+        <span>Papers</span>
+      </a>
+      <a class="button-box" href="examples/index.html">
         <div class="icon-circle">
           <img src="images/icon9.jpg" alt="Tutorials">
         </div>
-        <a href="examples/index.html">Examples & Tutorials</a>
-      </div>
+        <span>Examples &amp; Tutorials</span>
+      </a>
 
       <!-- Community & Support -->
-      <div class="button-box">
+      <a class="button-box" href="issues/index.html">
         <div class="icon-circle">
           <img src="images/icon2.jpg" alt="Support & Issues">
         </div>
-        <a href="https://github.com/r-inla/r-inla.github.io/issues">Support & Issues</a>
-      </div>
-      <div class="button-box">
+        <span>Support &amp; Issues</span>
+      </a>
+      <a class="button-box" href="ourteam/index.html">
         <div class="icon-circle">
           <img src="images/icon7.jpg" alt="Teams">
         </div>
-        <a href="ourteam/index.html">Our Team</a>
-      </div>
+        <span>Our Team</span>
+      </a>
 
       <!-- News & Updates -->
-      <div class="button-box">
+      <a class="button-box" href="https://x.com/bayescomp_inla">
         <div class="icon-circle">
           <img src="images/icon9.jpg" alt="News">
         </div>
-        <a href="https://x.com/bayescomp_inla">News</a>
-      </div>
-      <div class="button-box">
+        <span>News</span>
+      </a>
+      <a class="button-box" href="relatedprojects/index.html">
         <div class="icon-circle">
           <img src="images/icon5.jpg" alt="Related Projects">
         </div>
-        <a href="relatedprojects/index.html">Related Projects</a>
-      </div>
+        <span>Related Projects</span>
+      </a>
 
       <!-- Tools -->
-      <div class="button-box">
+      <a class="button-box" href="download/index.html">
         <div class="icon-circle">
           <img src="images/icon6.jpg" alt="Download">
         </div>
-        <a href="download/index.html">Download & Install</a>
+        <span>Download &amp; Install</span>
+      </a>
+    </section>
+
+    <section class="map-callout">
+      <div class="map-callout__content">
+        <h2>INLA Impact Around the Globe</h2>
+        <p>Explore the institutions and research groups citing INLA worldwide. Zoom and hover on the interactive map to see where the method is making an impact.</p>
+        <a class="map-button" href="map/index.html">Open the interactive map →</a>
       </div>
     </section>
 
-    <footer class="contact-footer">
-      <h2>Contact Us</h2>
-      <p>
-        To contact us with non-public matters, please write to<br>
-        <a href="mailto:help@r-inla.org">help@r-inla.org</a> or
-        <a href="mailto:hrue@r-inla.org">hrue@r-inla.org</a>.<br><br>
-        For all public discussions, please use our <a href="#">discussion forum</a>.
-      </p>
-    </footer>
+  <footer class="contact-footer">
+    <h2>Contact Us</h2>
+    <p>
+      For non-public inquiries, please email us at  
+      <a href="mailto:help@r-inla.org">help@r-inla.org</a> or  
+      <a href="mailto:hrue@r-inla.org">hrue@r-inla.org</a>.
+    </p>
+    <p>
+      For questions, issues, or suggestions related to this website, contact  
+      <a href="mailto:esmail@r-inla.org">esmail@r-inla.org</a>.
+    </p>
+  </footer>
 
-  </div>
+
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
-

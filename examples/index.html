@@ -10,33 +10,68 @@
 <body>
   <header class="team-header">
     <h1>Examples & Tutorials</h1>
-    <p>Explore how to use INLA through categorized examples and guided tutorials</p>
+    <p>Explore how to use INLA through real-world, reproducible examples.</p>
   </header>
 
-  <section class="tutorial-section">
-    <h2>Getting Started</h2>
-    <ul class="tutorial-list">
-      <li><a href="#">Basic INLA Syntax</a></li>
-      <li><a href="#">First GLM with INLA</a></li>
-      <li><a href="templates/my-inla-example.html" target="_blank">🧪 Poisson GLM with INLA</a></li>
-    </ul>
+  <!-- Intro / SEO copy -->
+  <section class="tutorial-section" aria-labelledby="intro">
+    <h2 id="intro">About these examples</h2>
+    <p>
+      This page curates practical INLA examples you can reuse and adapt. Each example focuses on a concrete task — from data preparation and model specification to interpretation and visualization — so you can move quickly from concept to results. We aim to showcase both foundational workflows and advanced techniques across domains such as spatial statistics, survival analysis, and joint models. Where relevant, you will find input data, code, and discussion of modeling choices, including priors and diagnostics, to help you understand why things work, not just how.
+    </p>
+    <p>
+      We’re expanding this gallery with more scenarios and datasets. In the meantime, the two examples below represent the structure and depth you can expect. If you have a use case you’d like to see covered, you can suggest it or contribute using the template.
+    </p>
   </section>
 
-  <section class="tutorial-section">
-    <h2>Spatial Models</h2>
-    <ul class="tutorial-list">
-      <li><a href="#">Spatial Point Patterns</a></li>
-      <li><a href="#">BYM and BYM2 Examples</a></li>
-    </ul>
+  <!-- Cards grid with two examples -->
+  <section class="cards" aria-labelledby="examples">
+    <div class="cards-header">
+      <h2 id="examples">Real-world Examples</h2>
+      <span class="coming-note">More examples coming soon</span>
+    </div>
+    <div class="card-grid">
+      <article class="card">
+        <h3>Joint Models for Longitudinal and Spatial Event-Time Data</h3>
+        <p>End-to-end workflow using INLA for linked longitudinal and event-time outcomes with spatial structure.</p>
+        <div class="meta">Topic: Spatial · Level: Advanced</div>
+        <a class="button" href="Baghfalaki_et_al/Baghfalaki-et-al-example.html" target="_blank" rel="noopener">Open example</a>
+      </article>
+
+      <article class="card">
+        <h3>Non-stationary Spatial Model for Dengue in Brazil: A Hands-On Guide</h3>
+        <p>Spatial disease mapping with a Besag (ICAR) prior on a microregion lattice, including workflow notes.</p>
+        <div class="meta">Topic: Spatial · Level: Intermediate</div>
+        <a class="button" href="fbesagExample/brazil_fbesag_workflow_pro_cited.html" target="_blank" rel="noopener">Open example</a>
+      </article>
+
+      <article class="card">
+        <h3>Bivariate meta-analysis of sensitivity and specificity</h3>
+        <p>Fitting a bivariate meta-analytic model; code and rationale for priors and inference.</p>
+        <div class="meta">Topic: Meta-analysis · Level: Intermediate</div>
+        <a class="button" href="bivariate-meta/bivariate-meta/bivmeta.html" target="_blank" rel="noopener">Open example</a>
+      </article>
+
+      <article class="card">
+        <h3>Salamander mating data</h3>
+        <p>Modeling count/outcome data with INLA; step-by-step from data to posterior summaries.</p>
+        <div class="meta">Topic: GLMM · Level: Beginner</div>
+        <a class="button" href="salamander/salamander/salamander.html" target="_blank" rel="noopener">Open example</a>
+      </article>
+    </div>
   </section>
 
-  <section class="tutorial-section">
-    <h2>Advanced Topics</h2>
-    <ul class="tutorial-list">
-      <li><a href="#">Non-Gaussian Latent Models</a></li>
-      <li><a href="#">Stochastic PDE Approach</a></li>
-    </ul>
+  <!-- Contribution CTA -->
+  <section class="cta" aria-labelledby="contribute">
+    <h2 id="contribute" style="margin:0 0 8px 0; font-size:20px; color:#2b4630;">Want a specific example?</h2>
+    <p style="margin:0;">
+      Suggest one via our <a href="../issues/index.html">Support & Issues</a> page, or use the
+      <a href="templates/my-inla-example.html" target="_blank" rel="noopener">example template</a> to draft and share your use case.
+    </p>
   </section>
+
+  
+
 
   <div style="text-align: center; margin: 50px 0;">
     <a href="../index.html" class="back-button">← Back to Home</a>
@@ -45,6 +80,23 @@
   <footer class="team-footer">
     <p>&copy; 2025 INLA Project</p>
   </footer>
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
-

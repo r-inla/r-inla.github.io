@@ -1,0 +1,200 @@
+---
+title: 'Salamander mating data'
+author: 'Haziq Jamil'
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    highlight: tango
+bibliography: refs.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+::: {.alert .alert-info}
+**Note:**
+This document adapts examples from the legacy R-INLA documentation, authored by the R-INLA team.
+:::
+
+## Introduction
+
+We consider the salamander mating experiments reported and analysed by [Section 14.5, @mccullagh1989generalized]. 
+Data consist of three separate experiments. 
+The first one, conducted in the summer of 1986, used two groups of 20 salamanders. Each group comprised five male Rough Butt, five male Whiteside, five female Rough Butt and five female Whiteside salamanders. 
+Within each group, each animal was paired to three animals of the opposite sex from the same and from the other population.
+Therefore, 60 male-female pairs were formed per group leading to 120 observations in one experiment for the two groups.
+Two further experiments with equal design were conducted in the fall of 1987. 
+The animals used for the first and the second experiment were identical. 
+A new set of salamanders was utilised for the third experiment.
+
+The main scientific question addressed in the study was whether the mating of both geographically isolated species of salamanders was as successful as the one between the animals from the same population.
+Moreover, there was some interest if a seasonal effect could be identified. 
+To this end, the following dummy variables were coded:
+
+- `fW` Whiteside female "yes": 1, "no": 0
+- `mW` Whiteside male "yes": 1, "no": 0
+- `WW` interaction effect of `wsf` and `wsm`
+- `fall` experiment conducted in fall "yes": 1, "no": 0
+
+## Model
+
+Let $Y_{ijk}$ denote the binary outcome (0 = failure, 1 = success) of
+the mating for female $i=1, \ldots, 20$ and male $j=1,\ldots, 20$ in
+experiment $k=1, \ldots, 3$. 
+Thus $Y_{ijk} \mid \pi_{ijk} \sim \operatorname{Bern}(\pi_{ijk})$, with
+$$
+\operatorname{logit}({\pi_{ijk}}) = \mathbf{x}_{ijk}^\top \boldsymbol{\beta} + b_{ik}^F + b_{jk}^M
+$$ 
+where $x_{ijk}$ is a vector comprising an intercept,
+${\tt wsf}_{ik}$, ${\tt wsm}_{jk}$, ${\tt ww}_{ijk}$ and
+${\tt fall}_{ijk}$ variables, $\boldsymbol{\beta}$ is the corresponding vector
+of the fixed effects parameters, and $b_{ik}^F$ and $b_{jk}^M$ are
+female and male random effects respectively.
+
+### Prior distributions
+
+We assume that $b_{i3}^F \sim \operatorname{N}(0, \kappa^F)$, $b_{i3}^M \sim \operatorname{N}(0, \kappa^M)$ and 
+$$
+\begin{align*}
+  {b_{i1}^F}\choose{b_{i2}^F} &\sim \operatorname{N}_2(\mathbf{0}, \mathbf{W}^{-1}_F)&
+  {b_{i1}^M}\choose{b_{i2}^M} &\sim \operatorname{N}_2(\mathbf{0}, \mathbf{W}^{-1}_M)  
+\end{align*}
+$$ 
+where the covariance matrices $\mathbf{W}^{-1}_F$ and $\mathbf{W}^{-1}_M$ are parameterised in terms of precisions and correlations leading to a total of eight hyperparameters in the model.
+
+### Hyperprior distributions
+
+We assume that both $\kappa^F$ and $\kappa^M$ follow a gamma prior distribution with shape equal to $1$ and rate equal to $0.622$. 
+The precision matrices $\mathbf{W}_M$ and $\mathbf{W}_F$ are Wishart distributed: 
+$$
+\begin{align*}
+  \mathbf{W}_M &\sim \text{Wishart}_{p}(r, \mathbf{R}^{-1})&
+  \mathbf{W}_F &\sim \text{Wishart}_{p}(r, \mathbf{R}^{-1})
+\end{align*}
+$$ 
+with the following settings:
+$$
+\begin{align*}
+  p = 2,& 
+  &r = 3,&
+  &\mathbf{R} = \begin{pmatrix}
+    1.244 &0 \\
+    0 & 1.244
+  \end{pmatrix}.
+\end{align*}
+$$ 
+
+## Data
+
+```{r}
+#| message: false
+# Load data and libraries
+library(tidyverse)
+library(INLA)
+here::i_am("salamander/salamander.Rmd")
+load(here::here("salamander/salam.RData"))
+str(salam)
+```
+
+Currently the responses of the mating experiments are stored in a $120 \times 3$ matrix `y`, where the columns correspond to the three experiments.
+The design matrix `x` is also stored in a separate matrix.
+We will have to organise the data into a form that is suitable for logistic regression, and also add all of the necessary indices for the random effects.
+
+```{r}
+dat <-
+  with(salam, {
+    data.frame(
+      exp = y,
+      fW = as.integer(x[, "W/R"] == 1 | x[, "W/W"] == 1),  # female Whiteside
+      mW = as.integer(x[, "R/W"] == 1 | x[, "W/W"] == 1),  # male Whiteside
+      # Matrix of female and male indices
+      t(apply(z, 1, \(x) {
+        tmp <- which(x == 1)
+        tmp[2] <- tmp[2] - 20
+        names(tmp) <- c("female", "male")
+        tmp
+      }))
+    )
+  }) |>
+  pivot_longer(
+    cols = starts_with("exp"),
+    names_to = "exp",
+    values_to = "y"
+  ) |>
+  mutate(
+    WW = fW * mW,  # interaction effect
+    fall = ifelse(exp == "exp.1", 0, 1),  # fall indicator
+    fid_e1e2 = case_when(
+      exp == "exp.1" ~ female,
+      exp == "exp.2" ~ female + 20,
+      TRUE ~ NA
+    ),
+    mid_e1e2 = case_when(
+      exp == "exp.1" ~ male,
+      exp == "exp.2" ~ male + 20,
+      TRUE ~ NA
+    ),
+    fid_e3 = ifelse(exp == "exp.3", female, NA),
+    mid_e3 = ifelse(exp == "exp.3", male, NA)
+  ) |>
+  select(y, fW, mW, WW, fall, exp, fid_e1e2, mid_e1e2, fid_e3, mid_e3)
+print(dat)
+```
+
+## Preliminary plot
+
+```{r}
+#| fig-height: 4
+#| fig-width: 7
+dat |>
+  mutate(cross = interaction(fW, mW, sep = "", lex.order = TRUE),
+         cross = recode(cross, "00"="R♀×R♂", "10"="W♀×R♂",
+                               "01"="R♀×W♂", "11"="W♀×W♂"),
+         season = if_else(fall==1, "Fall", "Summer")) |>
+  group_by(season, cross) |>
+  summarise(p_hat = mean(y), .groups = "drop") |>
+  ggplot(aes(x = cross, y = p_hat, col = season, group = season)) +
+  geom_point() + geom_line() +
+  labs(x = NULL, y = "Success rate", linetype = NULL, color = NULL) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  theme_minimal()
+```
+
+The exploratory plot illustrates the observed mating success rates for the four combinations of male–female salamander pairings, separated by season. A clear pattern emerges: matings between individuals of the same population (R♀×R♂ and W♀×W♂) show considerably higher success rates than those between different populations, particularly W♀×R♂, which exhibits the lowest success of all. This suggests some degree of reproductive isolation between the Rough Butt and Whiteside salamanders. 
+
+In addition, the overall success rates during the fall are consistently lower than in the summer, hinting at a possible seasonal effect—perhaps linked to environmental or physiological conditions that reduce mating success. These visual patterns motivate the logistic mixed model that follows, where we will test whether the female and male population origins, their interaction, and a fall indicator significantly affect the probability of successful mating, while allowing for random effects to account for individual-level variability among females and males.
+
+## INLA fit
+
+```{r}
+#| output: false
+frm <- y ~ fW + mW + WW + fall +
+  f(fid_e1e2, model = "iid2d", n = 40, param = c(3, 1.244, 1.244, 0)) +
+  f(mid_e1e2, model = "iid2d", n = 40, param = c(3, 1.244, 1.244, 0)) +
+  f(fid_e3, model = "iid", param = c(1, 0.622)) +
+  f(mid_e3, model = "iid", param = c(1, 0.622))
+
+# Note: To get smooth posterior marginals for the hyperparameters you need to
+# increase the number of maximum function evaluations: numint.maxfeval (default:
+# 10000)
+res <- inla(
+  formula = frm, 
+  data = dat, 
+  family = "binomial", 
+  Ntrials = rep(1, 360),
+  control.inla = list(numint.maxfeval = 200000), 
+  verbose = !TRUE
+)
+summary(res)
+```
+
+The INLA results confirm the main patterns seen in the exploratory plot. The intercept indicates a high baseline mating probability for within-population pairs. The strong negative effect for `fW` (–2.9) and the smaller negative effect for `mW` (–0.7) suggest that cross-population matings---particularly those involving Whiteside females---are substantially less successful. The large positive interaction term `WW` (+3.6) implies that when both partners are from the Whiteside population, mating success is restored to a level comparable to the Rough Butt pairs, consistent with reproductive isolation between the two groups. The seasonal term `fall` (–0.56) indicates a modest decline in success during the fall, though its credible interval includes zero. 
+
+The random-effect precisions are moderate, showing some heterogeneity among individuals, with a strong positive correlation among male random effects across the first two experiments. Overall, the model supports the hypothesis that cross-population matings are less successful and that season exerts a weaker secondary influence.
+
+
+## References
+

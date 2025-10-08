@@ -3,65 +3,93 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Create an INLA Issue</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <title>Support & Issues</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Create an INLA Issue</h1>
-    <p>Submit a question, report a bug, or share a suggestion. Files and code welcome.</p>
+  <header class="team-header">
+    <h1>Support & Issues</h1>
+    <p>Explore common problems and follow best practices before submitting a new issue</p>
   </header>
 
-  <main>
-    <form id="issueForm">
-      <label for="title">Issue Title</label>
-      <input type="text" id="title" required placeholder="Short summary">
+  <section class="tutorial-section">
+    <h2>1. Please Update R First</h2>
+    <p>
+      Most reported issues stem from using an outdated version of R. To avoid unnecessary errors and compatibility problems,
+      please ensure you're running the latest stable version. Download the latest version from the 
+      <a href="https://cran.r-project.org/" target="_blank">CRAN website</a>.
+    </p>
+  </section>
 
-      <label for="description">Description / Message</label>
-      <textarea id="description" rows="8" required placeholder="Details, code snippets, ideas..."></textarea>
+  <section class="tutorial-section">
+    <h2>2. Ensure INLA is Up to Date</h2>
+    <p>The R-INLA package is actively maintained. To upgrade, run the following in your R console:</p>
+    <div class="code-group">
+      <code>inla.upgrade()               # For the stable version</code>
+      <code>inla.upgrade(testing = TRUE) # For the testing version</code>
+    </div>
+  </section>
+  
+  <section class="tutorial-section">
+    <h2>3. Check the INLA Issue Tracker</h2>
+    <p>Before creating a new issue, browse the 
+      <a href="https://github.com/users/r-inla/projects/1/views/1" target="_blank">INLA Issue Tracker</a>. 
+      Issues are categorized with helpful labels like:
+    </p>
+    <div class="labels-list">
+      <span class="label bug">🐛 bug</span> – unexpected behavior or crashes<br>
+      <span class="label install">⚙️ installation</span> – setup or update issues<br>
+      <span class="label enhancement">✨ enhancement</span> – new feature requests<br>
+      <span class="label docs">📚 documentation</span> – unclear or missing help<br>
+      <span class="label duplicate">🔁 duplicate</span> – already reported<br>
+      <span class="label ntfixed">🚫 ntfixed</span> – known but not fixed<br>
+      <span class="label invalid">🧐 not reproducible / unclear</span> – unable to verify or missing details<br>
+      <span class="label newuser">🧭 new inla users</span> – first-time user questions
+    </div>
+  </section>
 
-      <label for="attachments">Attach files (optional)</label>
-      <input type="file" id="attachments" multiple>
+  <section class="tutorial-section">
+    <h2>4. Create a New Issue</h2>
+    <p>If the problem persists, open a new issue on the 
+      <a href="https://github.com/r-inla/r-inla.github.io/issues" target="_blank">GitHub Issues Page</a>. For best results:</p>
+    <ul class="tutorial-list">
+      <li>🧪 Include a <strong>reproducible example</strong> using simulated data if needed.</li>
+      <li>💻 Share your <strong>code snippet</strong> that causes the issue.</li>
+      <li>📝 Explain what you <strong>expected</strong> vs what <strong>actually happened</strong>.</li>
+      <li>📦 Mention your <strong>R and INLA versions</strong> using <code>R.version</code> and <code>packageVersion("INLA")</code>.</li>
+    </ul>
+  </section>
 
-      <button type="submit">Download & Submit Later</button>
-    </form>
+  <section class="tutorial-section">
+    <h2>5. Still Need Assistance?</h2>
+    <p>Contact us via <a href="mailto:help@r-inla.org">help@r-inla.org</a> for private issues.</p>
+  </section>
 
-    <div id="response"></div>
-  </main>
+  <div style="text-align: center; margin: 50px 0;">
+    <a href="../index.html" class="back-button">← Back to Home</a>
+  </div>
 
-  <footer>
-    <p>This form helps you prepare an issue for the INLA GitHub repo.</p>
+  <footer class="team-footer">
+    <p>&copy; 2025 INLA Project</p>
   </footer>
-
-  <script>
-    document.getElementById('issueForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const title = document.getElementById('title').value.trim();
-      const description = document.getElementById('description').value.trim();
-      const files = document.getElementById('attachments').files;
-
-      const zip = new JSZip();
-      zip.file('issue_title.txt', title);
-      zip.file('description.txt', description);
-
-      for (let file of files) {
-        const content = await file.arrayBuffer();
-        zip.file(file.name, content);
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
       }
-
-      zip.generateAsync({ type: 'blob' }).then(function (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = title.replace(/\s+/g, '_') + '_inla_issue.zip';
-        a.click();
-
-        document.getElementById('response').innerText = '✅ Issue packaged as ZIP file. You can email or upload it.';
-      });
-    });
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
   </script>
 </body>
 </html>
-

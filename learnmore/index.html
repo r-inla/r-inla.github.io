@@ -18,13 +18,13 @@
       <a href="books/index.html" target="_blank">Books</a>
     </div>
     <div class="learnmore-box">
-      <a href="https://becarioprecario.bitbucket.io/inla-gitbook/index.html" target="_blank">INLA GitBook</a>
+      <a href="https://github.com/hrue/r-inla" target="_blank">INLA Source Code</a>
     </div>
     <div class="learnmore-box">
-      <a href="https://www.r-inla.org/documentation" target="_blank">Documentation</a>
+      <a href="docs/index.html" target="_blank">Documentation Overview</a>
     </div>
     <div class="learnmore-box">
-      <a href="https://inla.r-inla-download.org/r-inla.org/doc/inla-manual/inla-manual.pdf" target="_blank">INLA Manual (PDF)</a>
+      <a href="docs/reference/index.html" target="_blank">Functions Reference</a>
     </div>
   </section>
 
@@ -35,6 +35,23 @@
   <footer class="team-footer">
     <p>&copy; 2025 INLA Project</p>
   </footer>
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
-

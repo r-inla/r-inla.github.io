@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation Hub – INLA Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: #0f2743;
+      line-height: 1.6;
+    }
+
+    a {
+      color: #006d77;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: #004f57;
+      text-decoration: underline;
+    }
+
+    header.doc-header {
+      background: #006d77;
+      color: #ffffff;
+      padding: 72px 20px 56px;
+      text-align: center;
+      border-bottom: 4px solid #bbcf32;
+    }
+
+    .doc-header h1 {
+      margin: 0;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .doc-header p {
+      margin: 18px auto 32px;
+      max-width: 720px;
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .doc-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .doc-button {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 32px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .doc-button.primary {
+      background: #bbcf32;
+      color: #0f2743;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .doc-button.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: none;
+    }
+
+    .doc-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
+    }
+
+    main.doc-content {
+      max-width: 960px;
+      margin: -40px auto 0;
+      padding: 0 20px 80px;
+    }
+
+    .doc-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 24px rgba(15, 39, 67, 0.08);
+      border: 1px solid rgba(0, 109, 119, 0.12);
+      border-top: 4px solid #bbcf32;
+    }
+
+    .doc-card h2 {
+      margin-top: 0;
+      font-size: 26px;
+      color: #0f2743;
+    }
+
+    .doc-card p {
+      margin-bottom: 18px;
+      color: #264660;
+    }
+
+    pre.doc-code {
+      background: #0f2743;
+      color: #f5f9ff;
+      padding: 18px 22px;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-size: 15px;
+    }
+
+    pre.doc-code code {
+      font-family: 'Source Code Pro', 'Fira Code', Menlo, Consolas, monospace;
+      background: transparent;
+      color: inherit;
+    }
+
+    ul.doc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px 24px;
+    }
+
+    ul.doc-list li {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    ul.doc-list li::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #bbcf32;
+      position: absolute;
+      top: 10px;
+      left: 0;
+    }
+
+    .doc-note {
+      margin-top: 18px;
+      font-size: 14px;
+      color: #3b5564;
+    }
+
+    footer.doc-footer {
+      text-align: center;
+      padding: 32px 16px 44px;
+      background: #f8f9fa;
+      color: #586b76;
+      font-size: 14px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    footer.doc-footer a {
+      color: #006d77;
+    }
+
+    @media (max-width: 640px) {
+      .doc-header h1 {
+        font-size: 32px;
+      }
+
+      .doc-card {
+        padding: 24px;
+      }
+
+      pre.doc-code {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="doc-header">
+    <h1>Documentation</h1>
+    <p>Curated entry points into INLA&rsquo;s latent models, priors, likelihoods, and vignettes. Use the quick commands below to explore the full catalogue directly from R, or jump into highlighted topics.</p>
+    <div class="doc-actions">
+      <a class="doc-button primary" href="reference/index.html">Browse Function Reference</a>
+      <a class="doc-button secondary" href="../index.html">Return to Learn More</a>
+    </div>
+  </header>
+
+  <main class="doc-content">
+    <section class="doc-card">
+      <h2>Quick commands from R</h2>
+      <p>Run these helpers inside R to list every model family, prior, or likelihood that ships with INLA.</p>
+      <pre class="doc-code"><code># Discover the available sections (latent, likelihood, prior, ...)
+inla.list.models()
+
+# Focus on a specific family
+inla.list.models("prior")
+
+# Read the inline documentation for a component
+inla.doc("loggamma")
+</code></pre>
+      <p class="doc-note">Try swapping <code>"prior"</code> for <code>"group"</code>, <code>"hazard"</code>, <code>"latent"</code>, <code>"likelihood"</code>, <code>"link"</code>, or <code>"mix"</code> to zoom in on that category.</p>
+    </section>
+
+    <section class="doc-card">
+      <h2>Selected latent models</h2>
+      <p>Popular latent specifications with working examples. Browse the full library at <a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/" target="_blank" rel="noopener noreferrer">inla.r-inla-download.org/r-inla.org/doc/latent/</a>.</p>
+      <ul class="doc-list">
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/ar1.pdf" target="_blank" rel="noopener noreferrer">Autoregressive model of order 1</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/ar.pdf" target="_blank" rel="noopener noreferrer">Autoregressive model of order p</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/besag.pdf" target="_blank" rel="noopener noreferrer">Besag model for spatial effects</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/dmatern.pdf" target="_blank" rel="noopener noreferrer">dMatern latent model</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/generic0.pdf" target="_blank" rel="noopener noreferrer">Generic0 model</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/iid.pdf" target="_blank" rel="noopener noreferrer">Correlated random effects (iid)</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/rw1.pdf" target="_blank" rel="noopener noreferrer">Random walk model of order 1</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/rw2.pdf" target="_blank" rel="noopener noreferrer">Random walk model of order 2</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/seasonal.pdf" target="_blank" rel="noopener noreferrer">Seasonal variation model</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/latent/logdist.pdf" target="_blank" rel="noopener noreferrer">Lognormal latent model</a></li>
+      </ul>
+      <p class="doc-note">Each model entry includes hyperparameter defaults, constraints, and the matching <code>inla.doc()</code> key.</p>
+    </section>
+
+    <section class="doc-card">
+      <h2>Selected priors</h2>
+      <p>Frequently used priors and their parameterisations. Explore every prior PDF at <a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/" target="_blank" rel="noopener noreferrer">inla.r-inla-download.org/r-inla.org/doc/prior/</a>.</p>
+      <ul class="doc-list">
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/betacorrelation.pdf" target="_blank" rel="noopener noreferrer">Beta prior for correlation parameters</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/dirichlet.pdf" target="_blank" rel="noopener noreferrer">Dirichlet prior</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/expression.pdf" target="_blank" rel="noopener noreferrer">Expression (custom) prior</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/gaussian.pdf" target="_blank" rel="noopener noreferrer">Gaussian prior</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/logitbeta.pdf" target="_blank" rel="noopener noreferrer">Logit-Beta prior</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/pc.cor0.pdf" target="_blank" rel="noopener noreferrer">PC prior for correlation &rho; (base model &rho; = 0)</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/pc.cor1.pdf" target="_blank" rel="noopener noreferrer">PC prior for correlation &rho; (base model &rho; = 1)</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/pc.dof.pdf" target="_blank" rel="noopener noreferrer">PC prior for degrees of freedom</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/pc.gamma.pdf" target="_blank" rel="noopener noreferrer">PC prior for Gamma shape</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/prior/pc.prec.pdf" target="_blank" rel="noopener noreferrer">PC prior for precision</a></li>
+      </ul>
+      <p class="doc-note">Use <code>inla.prior.control()</code> to apply these priors directly inside your model definitions.</p>
+    </section>
+
+    <section class="doc-card">
+      <h2>Selected likelihoods</h2>
+      <p>Likelihood families with simulated examples and parameter details. Browse the full catalogue at <a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/" target="_blank" rel="noopener noreferrer">inla.r-inla-download.org/r-inla.org/doc/likelihood/</a>.</p>
+      <ul class="doc-list">
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/beta.pdf" target="_blank" rel="noopener noreferrer">Beta distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/betabinomial.pdf" target="_blank" rel="noopener noreferrer">Beta-Binomial distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/binomial.pdf" target="_blank" rel="noopener noreferrer">Binomial distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/cenpoisson.pdf" target="_blank" rel="noopener noreferrer">Censored Poisson distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/exponential.pdf" target="_blank" rel="noopener noreferrer">Exponential distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/gamma.pdf" target="_blank" rel="noopener noreferrer">Gamma distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/gaussian.pdf" target="_blank" rel="noopener noreferrer">Gaussian distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/logistic.pdf" target="_blank" rel="noopener noreferrer">Logistic distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/lognormal.pdf" target="_blank" rel="noopener noreferrer">Lognormal distribution</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/likelihood/poisson.pdf" target="_blank" rel="noopener noreferrer">Poisson distribution</a></li>
+      </ul>
+      <p class="doc-note">Combine likelihood entries with the latent model listings above to assemble complete joint models.</p>
+    </section>
+
+    <section class="doc-card">
+      <h2>Key vignettes &amp; tutorials</h2>
+      <ul class="doc-list">
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/SPDE1d.pdf" target="_blank" rel="noopener noreferrer">SPDE one-dimensional example</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/SPDEhowto.pdf" target="_blank" rel="noopener noreferrer">Introduction to fitting SPDE models</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/bGEVtutorial1-2.pdf" target="_blank" rel="noopener noreferrer">Blended GEV tutorial</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/conditional-sampling.pdf" target="_blank" rel="noopener noreferrer">Conditional sampling from a fitted model</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/conditional_logit.pdf" target="_blank" rel="noopener noreferrer">Conditional logistic regression</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/int-design.pdf" target="_blank" rel="noopener noreferrer">User-defined integration points</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/rgeneric.pdf" target="_blank" rel="noopener noreferrer">Defining latent models via <code>rgeneric</code></a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/multinomial.pdf" target="_blank" rel="noopener noreferrer">Multinomial logit models</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/sample-eval.pdf" target="_blank" rel="noopener noreferrer">Approximating joint marginals</a></li>
+        <li><a href="https://inla.r-inla-download.org/r-inla.org/doc/vignettes/scale-model.pdf" target="_blank" rel="noopener noreferrer">Scaling IGMRF models</a></li>
+      </ul>
+    </section>
+
+    <div class="doc-card">
+      <h2>Need the raw data or code?</h2>
+      <p>The function reference includes reproducible examples plus datasets such as <code>Scotland</code>, <code>Seeds</code>, and <code>Munich</code>. You can load them directly in R after attaching the INLA package:</p>
+      <pre class="doc-code"><code>library(INLA)
+data("Scotland")
+str(Scotland)
+</code></pre>
+      <p class="doc-note">Looking for something specific? Use the search box on the <a href="reference/index.html">function reference</a> page, or run <code>inla.doc("&lt;keyword&gt;")</code> in R.</p>
+    </div>
+  </main>
+
+  <footer class="doc-footer">
+    &copy; 2025 INLA Project &middot; Maintained with resources from <a href="https://github.com/hrue/r-inla" target="_blank" rel="noopener noreferrer">hrue/r-inla</a>
+  </footer>
+
+  <script data-nav-loader="inla">
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

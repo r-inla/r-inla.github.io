@@ -1,85 +1,138 @@
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #ffffff;
   margin: 0;
-  padding: 0;
+  background-color: #ffffff;
   color: #222;
 }
 
 .team-header {
   text-align: center;
-  background-color: #f0f4f8;
-  padding: 40px 20px;
-  border-bottom: 1px solid #ddd;
+  background-color: #006d77;
+  padding: 50px 20px;
+  border-bottom: 4px solid #bbcf32;
 }
 
 .team-header h1 {
-  font-size: 32px;
-  color: #006d77;
+  font-size: 36px;
+  color: #ffffff;
   margin-bottom: 10px;
 }
 
 .team-header p {
   font-size: 18px;
-  color: #444;
+  color: #e0f7f5;
+  margin-top: 0;
 }
 
-.learnmore-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+.books-section {
   padding: 40px 20px;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
 }
 
-.learnmore-box {
-  background-color: #f5f7fb;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 30px 20px;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-  transition: transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* still 3 per row */
+  gap: 40px; /* increase gap */
 }
 
-.learnmore-box:hover {
+.book-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.book-card:hover {
   transform: translateY(-5px);
 }
 
-.learnmore-box a {
+.book-card img {
+  width: 100%;
+  aspect-ratio: 2 / 3; /* Keeps consistent proportions, scales with width */
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.book-card h3 {
+  font-size: 18px;
+  margin-top: 15px;
+  color: #333;
+}
+
+.book-card p a {
   color: #006d77;
   text-decoration: none;
-  display: inline-block;
-}
-
-.learnmore-box a:hover {
-  text-decoration: underline;
-}
-
-.back-button {
-  padding: 10px 24px;
-  background-color: #006d77;
-  color: #fff;
-  text-decoration: none;
   font-weight: 600;
-  border-radius: 30px;
-  transition: background-color 0.3s ease;
-  display: inline-block;
 }
 
-.back-button:hover {
-  background-color: #004f57;
+.back-link {
+  text-align: center;
+  margin: 50px 0;
+}
+
+.back-link a {
+  color: #006d77;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .team-footer {
   text-align: center;
-  padding: 24px 10px;
-  background-color: #f8f9fa;
+  padding: 20px;
+  background: #f0f0f0;
+  border-top: 1px solid #ddd;
   font-size: 14px;
-  color: #888;
-  border-top: 1px solid #eee;
+}
+
+@media (max-width: 900px) {
+  .book-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  margin-top: -10px;
+}
+
+.book-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.book-links a {
+  text-decoration: none;
+  background-color: #006d77;
+  color: white;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+
+.book-links a:hover {
+  background-color: #005760;
+}
+
+.book-description {
+  font-size: 14px;
+  color: #444;
+  text-align: left;
+  line-height: 1.6;
 }
 

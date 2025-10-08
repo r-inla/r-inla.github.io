@@ -9,7 +9,9 @@ body {
 /* Header */
 .team-header {
   text-align: center;
-  background-color: #006d77;
+  background: linear-gradient(135deg, #006d77 0%, #0b8793 100%);
+  position: relative;
+  overflow: hidden;
   padding: 50px 20px;
   border-bottom: 4px solid #bbcf32;
 }
@@ -25,6 +27,21 @@ body {
   color: #e0f7f5;
   margin-top: 0;
 }
+
+/* Optional hero image overlay (subtle) */
+.team-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-image, none);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+  filter: saturate(70%) blur(1px);
+  pointer-events: none;
+}
+
+.team-header > * { position: relative; z-index: 1; }
 
 /* Tutorial Section */
 .tutorial-section {
@@ -91,3 +108,98 @@ body {
   border-top: 1px solid #eee;
 }
 
+.tutorial-section p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #006d77;
+}
+
+/* Cards Grid */
+.cards {
+  max-width: 1100px;
+  margin: 20px auto 50px;
+  padding: 0 20px;
+}
+
+.cards-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.cards-header h2 {
+  margin: 0;
+  color: #006d77;
+}
+
+.coming-note {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #0b6b74;
+}
+
+.card p {
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+.card .meta {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.card a.button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: #006d77;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.card a.button:hover { background: #dd8545; }
+
+/* CTA banner */
+.cta {
+  max-width: 900px;
+  margin: 10px auto 40px;
+  padding: 14px 16px;
+  border: 1px dashed #bbcf32;
+  border-radius: 10px;
+  background: #fbfff1;
+  color: #2b4630;
+}
+
+.cta a { color: #0b6b74; font-weight: 600; text-decoration: none; }
+.cta a:hover { text-decoration: underline; }
+
+/* FAQ */
+.faq { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+.faq h2 { color: #006d77; border-left: 5px solid #bbcf32; padding-left: 12px; }
+.faq-item { margin: 16px 0; }
+.faq-item h3 { margin: 0 0 6px 0; color: #0b6b74; font-size: 18px; }
+.faq-item p { margin: 0; color: #333; }
