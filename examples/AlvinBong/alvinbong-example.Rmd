@@ -1,0 +1,250 @@
+---
+title: "INLA Example: Bayesian Spatial Modeling of School Disparities in Brunei Darussalam"
+author: "Alvin Bong"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    highlight: tango
+  word_document:
+    toc: true
+  pdf_document:
+    toc: true
+---
+
+## Description
+
+This example demonstrates how to fit a **Spatial Bayesian Hierachical Poisson Model** using the `INLA` package in R version 4.5.1.  
+We illustrate the workflow using a real dataset of school infrastructures and associated covariates, and analyze the posterior estimates.
+
+- **Modeling goal:** Identify administrative regions in Brunei where school availability is significantly lower than the national baseline, after adjusting for population and socioeconomic factors.
+- **Tutorial goal:** Demonstrate the syntax and workflow of INLA for fitting spatial Poisson models, with potential applications to similar count-based areal data — e.g., healthcare access, crime incidence, or infrastructure distribution in other regions.
+- **Model type:** Spatial Bayesian Hierachical Poisson Model
+- **Tags:** `Spatial`, `Bayesian`, `INLA`, `Poisson`
+
+---
+
+### Load necessary libraries for statistical modeling, spatial analysis, and visualization
+
+```r
+# Clear the workspace
+rm(list = ls())
+
+# --- Libraries for Bayesian inference and statistical modeling ---
+library(INLA)          # Integrated Nested Laplace Approximations
+
+# --- Libraries for spatial statistics ---
+library(sf)            # Spatial data
+library(spdep)         # Spatial dependence (e.g., poly2nb)
+
+# --- Libraries for visualization ---
+library(mapview)       # Visualize map
+library(RColorBrewer)  # Color schemes
+
+# --- Notes ---
+# Ensure all packages are installed before running:
+# install.packages(c("INLA", "sf", "spdep", "mapview", "RColorBrewer")
+```
+
+## Data Description
+
+The full dataset, including its source and cleaning process, is detailed in [Alvin Bong (2025)](https://alvinbjl.github.io/school-disparity-areal-model/).
+For illustration purposes, we directly present the prepared data here.
+
+### Areal data (`sch_sf`)
+The areal data is organized by *mukim* (sub-district). The variables include:
+  
+- **mukim**: Names of all 39 mukims in Brunei Darussalam
+- **schools**: Number of schools in each mukim
+- **geometry**: Spatial boundaries of each mukim (simple features format)
+- **area**: Size of each mukim (in square kilometers)
+- **population**: Population count in each mukim
+- **house_price**: Median house price in each mukim (in BND millions)
+
+### Overview
+
+We visualise schools counts per mukim as exploratory data analysis:
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(sf)
+library(spdep)
+library(INLA)
+library(mapview)
+library(RColorBrewer)
+set.seed(123)
+```
+
+```{r}
+# Load & view data
+load("data.Rdata")
+head(sch_sf )
+
+
+# --- Plot with mapview ---
+pal <- colorRampPalette(brewer.pal(9, "YlOrRd"))
+mapview(sch_sf, zcol="schools", col.region=pal)
+```
+
+
+
+## Model Specification and Fitting
+
+We fit a **Spatial Bayesian Hierachical Poisson Model** using `inla()`. Bayesian hierarchical models enable us to obtain smoothed relative abundance (RA) of schools by including covariates and random effects to borrow information from neighboring areas.
+
+The **relative abundance (RA)** $\theta_i$, analogous to a relative risk in disease mapping, quantifies whether an area $i$ has higher ($\theta_i > 1$) or lower ($\theta_i < 1$) school count than the national average. For example, $\theta_i = 0.5$ means mukim $i$ has half the number of schools expected under the national average, highlighting disparities in school infrastructure.
+
+Let $Y_i$ and $E_i$ denote the observed and expected counts of schools respectively, in mukim $i \in \{1, \dotsc, n\}$. We assume the following Poisson hierarchical model, incorporating spatial structure via the Besag-York-Mollié (BYM2):
+
+\[
+Y_i \mid \theta_i \sim \text{Poisson}(E_i \cdot \theta_i), \quad i = 1, \dotsc, n
+\]
+
+\[
+\log(\theta_i) = \beta_0 + \beta_1 \cdot \text{pop}_i + \beta_2 \cdot \text{area}_i + \beta_3 \cdot \text{hp}_i + u_i + v_i,
+\]
+
+where:  
+
+- $\beta_0$ is the intercept,
+
+- $\beta_1$, $\beta_2$, and $\beta_3$ are regression coefficients for the standardized covariates:
+
+  - $\text{pop}_i$: population (in units of 10,000),
+  
+  - $\text{area}_i$: mukim size (in units of 10 km²),
+  
+  - $\text{hp}_i$: median house price (in BND \$1,000,000),
+  
+- $u_i$ is a structured spatial effect, modelled using an intrinsic conditional autoregressive (CAR) prior $u_i \mid u_{-i} \sim \mathcal{N}(\bar{u}_{\delta_i}, \frac{1}{\tau_u n_{\delta_i}})$
+
+- $v_i$ is an unstructured random effect, $v_i \sim \text{Normal}(0, \frac{1}{\tau_v})$
+
+
+### Expected School Count
+The expected number of schools per mukim is computed using indirect standardization:
+
+\[
+E_i = \sum_{j=1}^{n} Y_j \cdot \frac{\text{pop}_i}{\sum_{j=1}^{n} \text{pop}_j}
+\]
+
+```{r}
+sch_sf$expected_schools <- sum(sch_sf$schools) * sch_sf$population/sum(sch_sf$population)
+```
+
+### Spatial Neighborhood Structure
+Given that our spatial data are in areal units (mukims), we define spatial neighbors based on shared boundaries (queen contiguity) between mukims. Creating this neighborhood structure (as an adjacency matrix) is required for fitting spatial models such as BYM2 in INLA.
+
+
+```{r}
+
+# 1. Create a neighborhood list based on polygon contiguity
+# Note: Extra steps required to convert/read data if it is not in sf format
+nb <- spdep::poly2nb(sch_sf)
+
+# 2. Convert the neighbor list to INLA adjacency format
+spdep::nb2INLA("map.graph", nb)
+
+# 3. Set the location of the adjacency file for INLA
+map.adj <- file.path(getwd(), "map.graph")
+
+# 4. Load adjacency matrix as a graph for INLA spatial models
+g <- inla.read.graph(filename = map.adj)
+
+# # 5. Optional: Visualize the adjacency matrix
+# image(inla.graph2matrix(g), 
+#       xlab = "Region", 
+#       ylab = "Region", 
+#       main = "Spatial Adjacency Matrix")
+      
+```
+
+### Inla call/ fit
+
+We now fit the BYM2 model including covariates and spatial random effects.
+
+```{r}
+# index for spatial effects
+sch_sf$re_u <- 1:nrow(sch_sf)
+
+# specify model formula
+formula <- schools ~ population + area + house_price + f(re_u, model = "bym2", graph = g)
+
+# run model
+res <- inla(formula, family = "poisson", data = sch_sf, E = expected_schools,
+            control.predictor = list(compute = TRUE),
+            control.compute = list(return.marginals.predictor = TRUE),
+            verbose = TRUE)
+```
+
+
+
+---
+
+### Posterior Results and Summary
+
+We summarize the fixed effects, hyperparameters, and model fit metrics, and visualize the posterior estimates.
+
+```r
+# fixed effects, hyperparameters, and model fit metrics
+summary(res)
+
+# posterior estimates: Relative Abundance (RA)
+head(res$summary.fitted.values)
+```
+
+### Interpretation of Results
+
+| Parameter    | Mean   | 95% Credible Interval | Interpretation                                                                                                                           |
+| ------------ | ------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **(Intercept)**| 1.076  | 0.239 – 1.893        | Intercept for log-relative abundance at baseline, when all covariates are zero.                                               |
+| **population** | -0.436 | -0.579 – -0.295      | Effect of population on RA/school count: negative, higher population corresponds to lower relative abundance of schools. Credible interval does not include 0 → significant.       |
+| **area**       | 0.015  | -0.002 – 0.032       | Effect of mukim size on RA: weak/no effect, 95% CI includes zero, not significant |
+| **house_price**| -0.758 | -3.174 – 1.705       | Effect of house price on RA: weak/no effect, 95% CI includes zero, not significant |
+                                
+
+---
+
+### Spatial Mapping of Relative Abundance
+
+We visualize the posterior mean of relative abundance $\theta_i$:
+```{r}
+# Store values to our sf data frame
+sch_sf$RA <- res$summary.fitted.values[, "mean"]
+
+# Plot
+pal <- colorRampPalette(brewer.pal(9, "YlOrRd"))
+at <- c(0,0.5,1,2,3,4,10)
+mapview(sch_sf, zcol = "RA", col.region=pal, at=at, layer.name="RA")
+```
+
+### Non-exceedance Probability
+
+We compute the non-exceedance probability, which represents the probability that the posterior i.e. relative abundance (RA) in a given mukim falls below a threshold value (set at 0.7 in our case). This allows us to identify mukims that are likely to have lower-than-expected school access. 
+
+```{r}
+# -------------------------------
+# 1. Compute non-exceedance probabilities from posterior distributions
+sch_sf$exc <- sapply(res$marginals.fitted.values,
+                      FUN = function(marg){inla.pmarginal(q = 0.7, marginal = marg)})
+
+# 2. Plot
+at <- c(0,0.25,0.5,0.75,1)
+mapview(sch_sf, zcol = "exc", col.region=pal, at=at, 
+        layer.name="Non-Exceedance Probability RA < 0.7")
+# -------------------------------
+
+```
+
+
+## References
+
+- Alvin Bong (2025).  
+  *Bayesian Spatial Modeling of School Disparities in Brunei Darussalam.*          [https://github.com/alvinbjl/school-disparity-areal-model/](https://github.com/alvinbjl/school-disparity-areal-model/)
+
+
+
+
