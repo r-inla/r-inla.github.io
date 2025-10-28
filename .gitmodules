@@ -1,3 +1,0 @@
-[submodule "r-inla"]
-	path = r-inla
-	url = https://github.com/hrue/r-inla.git
