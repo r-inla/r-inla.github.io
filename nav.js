@@ -4,22 +4,58 @@
   }
   window.__inlaGlobalNavMounted = true;
 
-  var navItems = [
+  var navGroups = [
     { label: 'Home', path: 'index.html' },
-    { label: 'What is INLA?', path: 'whatisinla/index.html' },
-    { label: 'Download & Install', path: 'download/index.html' },
-    { label: 'Examples & Tutorials', path: 'examples/index.html' },
-    { label: 'Support & Issues', path: 'issues/index.html' },
-    { label: 'Learn More', path: 'learnmore/index.html' },
-    { label: 'Documentation', path: 'learnmore/docs/index.html' },
-    { label: 'Function Reference', path: 'learnmore/docs/reference/index.html' },
-    { label: 'Books', path: 'learnmore/books/index.html' },
-    { label: 'Citations Map', path: 'map/index.html' },
-    { label: 'INLA Publications', path: 'papers/index.html' },
-    { label: 'Our Team', path: 'ourteam/index.html' },
-    { label: 'Related Projects', path: 'relatedprojects/index.html' },
-    { label: 'News & Updates', path: 'https://x.com/bayescomp_inla', external: true }
+    {
+      label: 'Learn',
+      children: [
+        { label: 'What is INLA?', path: 'whatisinla/index.html' },
+        { label: 'Learn More Overview', path: 'learnmore/index.html' },
+        { label: 'Documentation (pkgdown)', path: 'learnmore/docs/index.html' },
+        { label: 'Function Reference', path: 'learnmore/docs/reference/index.html' },
+        { label: 'Books & Guides', path: 'learnmore/books/index.html' }
+      ]
+    },
+    {
+      label: 'Use INLA',
+      children: [
+        { label: 'Download & Install', path: 'download/index.html' },
+        { label: 'Examples & Tutorials', path: 'examples/index.html' },
+        { label: 'Support & Issues', path: 'issues/index.html' }
+      ]
+    },
+    {
+      label: 'Resources',
+      children: [
+        { label: 'INLA Publications', path: 'papers/index.html' },
+        { label: 'Citations Map', path: 'map/index.html' },
+        { label: 'Related Projects', path: 'relatedprojects/index.html' }
+      ]
+    },
+    {
+      label: 'Community',
+      children: [
+        { label: 'Our Team', path: 'ourteam/index.html' },
+        { label: 'News & Updates', path: 'https://x.com/bayescomp_inla', external: true }
+      ]
+    }
   ];
+
+  function flattenNavGroups(groups) {
+    var items = [];
+    groups.forEach(function (group) {
+      if (group.children && group.children.length) {
+        group.children.forEach(function (child) {
+          items.push(child);
+        });
+      } else {
+        items.push(group);
+      }
+    });
+    return items;
+  }
+
+  var navItems = flattenNavGroups(navGroups);
 
   function computePrefix() {
     var segments = window.location.pathname.split('/').filter(Boolean);
@@ -65,32 +101,90 @@
     return currentNormalized.indexOf(targetDir) === 0;
   }
 
-  var nav = document.createElement('nav');
-  nav.className = 'inla-left-nav';
-  nav.setAttribute('aria-label', 'Site navigation');
+  function createLeftNav() {
+    if (!document.body) {
+      return;
+    }
 
-  var hotspot = document.createElement('div');
-  hotspot.className = 'inla-left-nav__hotspot';
+    var nav = document.createElement('nav');
+    nav.className = 'inla-left-nav';
+    nav.setAttribute('aria-label', 'Site navigation');
 
-  var listMarkup = navItems.map(function (item) {
-    var activeClass = isActive(item.path, item.external) ? ' class="is-active"' : '';
-    var targetAttrs = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-    return '<li><a' + activeClass + targetAttrs + ' href="' + resolveHref(item.path, item.external) + '">' + item.label + '</a></li>';
-  }).join('');
+    var hotspot = document.createElement('div');
+    hotspot.className = 'inla-left-nav__hotspot';
 
-  var panel = document.createElement('div');
-  panel.className = 'inla-left-nav__panel';
-  panel.innerHTML = [
-    '<div class="inla-left-nav__brand"><a href="' + resolveHref('index.html') + '">INLA Project</a></div>',
-    '<button class="inla-left-nav__close" type="button" aria-label="Close navigation">Close</button>',
-    '<ul class="inla-left-nav__list">' + listMarkup + '</ul>'
-  ].join('');
+    var listMarkup = navItems
+      .map(function (item) {
+        var activeClass = isActive(item.path, item.external) ? ' class="is-active"' : '';
+        var targetAttrs = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return '<li><a' + activeClass + targetAttrs + ' href="' + resolveHref(item.path, item.external) + '">' + item.label + '</a></li>';
+      })
+      .join('');
 
-  nav.appendChild(hotspot);
-  nav.appendChild(panel);
+    var panel = document.createElement('div');
+    panel.className = 'inla-left-nav__panel';
+    panel.innerHTML = [
+      '<div class="inla-left-nav__brand"><a href="' + resolveHref('index.html') + '">INLA Project</a></div>',
+      '<button class="inla-left-nav__close" type="button" aria-label="Close navigation">Close</button>',
+      '<ul class="inla-left-nav__list">' + listMarkup + '</ul>'
+    ].join('');
+
+    nav.appendChild(hotspot);
+    nav.appendChild(panel);
+
+    var closeButton = panel.querySelector('.inla-left-nav__close');
+    var firstLink = panel.querySelector('.inla-left-nav__list a');
+
+    function openMenu() {
+      document.body.classList.add('inla-left-nav-open');
+    }
+
+    function closeMenu() {
+      document.body.classList.remove('inla-left-nav-open');
+    }
+
+    nav.addEventListener('mouseenter', openMenu);
+    nav.addEventListener('mouseleave', closeMenu);
+    hotspot.addEventListener('mouseenter', openMenu);
+    hotspot.addEventListener('click', function () {
+      document.body.classList.toggle('inla-left-nav-open');
+    });
+
+    nav.addEventListener('focusin', openMenu);
+    nav.addEventListener('focusout', function () {
+      setTimeout(function () {
+        if (!nav.contains(document.activeElement)) {
+          closeMenu();
+        }
+      }, 0);
+    });
+
+    if (closeButton) {
+      closeButton.addEventListener('click', function () {
+        closeMenu();
+        if (firstLink) {
+          firstLink.focus();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && document.body.classList.contains('inla-left-nav-open')) {
+        closeMenu();
+      }
+    });
+
+    document.body.classList.add('has-inla-left-nav');
+    document.body.appendChild(nav);
+  }
 
   var style = document.createElement('style');
   style.textContent = [
+    'nav.inla-left-nav .inla-left-nav__list a:focus-visible,',
+    'nav.inla-left-nav .inla-left-nav__close:focus-visible {',
+    '  outline: 2px solid #bbcf32;',
+    '  outline-offset: 2px;',
+    '}',
     'body.has-inla-left-nav {',
     '  margin: 0;',
     '  transition: margin-left 0.25s ease;',
@@ -236,48 +330,14 @@
   ].join('\n');
 
   document.head.appendChild(style);
-  document.body.classList.add('has-inla-left-nav');
-  document.body.insertAdjacentElement('afterbegin', nav);
 
-  var closeButton = panel.querySelector('.inla-left-nav__close');
-  var firstLink = panel.querySelector('.inla-left-nav__list a');
-
-  function openMenu() {
-    document.body.classList.add('inla-left-nav-open');
+  function init() {
+    createLeftNav();
   }
 
-  function closeMenu() {
-    document.body.classList.remove('inla-left-nav-open');
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
-
-  nav.addEventListener('mouseenter', openMenu);
-  nav.addEventListener('mouseleave', closeMenu);
-  hotspot.addEventListener('mouseenter', openMenu);
-  hotspot.addEventListener('click', function () {
-    document.body.classList.toggle('inla-left-nav-open');
-  });
-
-  nav.addEventListener('focusin', openMenu);
-  nav.addEventListener('focusout', function () {
-    setTimeout(function () {
-      if (!nav.contains(document.activeElement)) {
-        closeMenu();
-      }
-    }, 0);
-  });
-
-  if (closeButton) {
-    closeButton.addEventListener('click', function () {
-      closeMenu();
-      if (firstLink) {
-        firstLink.focus();
-      }
-    });
-  }
-
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' && document.body.classList.contains('inla-left-nav-open')) {
-      closeMenu();
-    }
-  });
 })();

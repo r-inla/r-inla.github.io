@@ -26,6 +26,8 @@ Rscript --vanilla -e 'if (!requireNamespace("fmesher", quietly = TRUE)) install.
 # Build only the reference section; this is faster and avoids touching vignettes.
 (
   cd "${PKG_DIR}"
+  mkdir -p "${HOME}/tmp"
+  ( cd R && ./make-man-pages )
   Rscript --vanilla -e 'pkgdown::build_reference(lazy = TRUE)'
 )
 

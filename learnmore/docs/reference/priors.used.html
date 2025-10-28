@@ -32,12 +32,6 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/AA-group-cv.html">Cross-validation and group-cross-validation in INLA</a>
-    </li>
-    <li>
-      <a href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    </li>
-    <li>
       <a href="../articles/bGEVtutorial1-2.html">Blended GEV: a tutorial using R-INLA</a>
     </li>
     <li>
@@ -47,54 +41,24 @@
       <a href="../articles/conditional-sampling.html">Conditional sampling from a fitted model</a>
     </li>
     <li>
-      <a href="../articles/Dirichlet-CoDa.html">Fitting CoDa using the Logistic Gaussian distribution with Dirichlet covariance structure</a>
-    </li>
-    <li>
       <a href="../articles/int-design.html">User defined integration points</a>
-    </li>
-    <li>
-      <a href="../articles/jmarginal.html">Approximating joint marginals</a>
     </li>
     <li>
       <a href="../articles/multinomial.html">Multinomial logit models with INLA</a>
     </li>
     <li>
-      <a href="../articles/old-faq.html">Short tutorials from old www-page</a>
-    </li>
-    <li>
-      <a href="../articles/rgeneric.html">Defining a latent model in R or C</a>
-    </li>
-    <li>
-      <a href="../articles/sample-eval.html">The inla.posterior.sample.eval-function</a>
-    </li>
-    <li>
-      <a href="../articles/scale-model.html">Scaling IGMRF-models in R-INLA</a>
+      <a href="../articles/rgeneric.html">Defining a latent model in `R`: The `rgeneric` model</a>
     </li>
     <li>
       <a href="../articles/Old/SPDE1d.html">SPDE one dimensional example</a>
     </li>
     <li>
-      <a href="../articles/SPDE2mdatasurv.html">SPDE example with multiple kind of outcomes</a>
-    </li>
-    <li>
       <a href="../articles/Old/SPDEhowto.html">SPDE how to</a>
     </li>
     <li>
-      <a href="../articles/stack-with-factors.html">Avoiding trouble with factors in inla.stack</a>
-    </li>
-    <li>
-      <a href="../articles/svc.html">Spatially Varying Coefficient Models with R-INLA</a>
-    </li>
-    <li>
-      <a href="../articles/Tutorial_barrier_global.html">Global oceanic barrier model on the sphere</a>
-    </li>
-    <li>
-      <a href="../articles/barrier-global/Tutorial_barrier_global.html">Global oceanic barrier model on the sphere</a>
+      <a href="../articles/stack-with-factors.html">Avoiding trouble with factors in _inla.stack()_</a>
     </li>
   </ul></li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -114,7 +78,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">inla.priors.used</span><span class="op">(</span><span class="va">result</span>, digits <span class="op">=</span> <span class="fl">6L</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">inla.priors.used</span><span class="op">(</span><span class="va">result</span>, digits<span class="op">=</span><span class="fl">6L</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -122,9 +86,7 @@
 
 
 <dl><dt id="arg-result">result<a class="anchor" aria-label="anchor" href="#arg-result"></a></dt>
-<dd><p>An <code>inla</code>-object, typically the output from an
-<code><a href="inla.html">inla()</a></code>-call</p></dd>
-
+<dd><p>An <code>inla</code>-object, typically the output from an <code><a href="inla.html">inla()</a></code>-call</p></dd>
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
 <dd><p>The <code>digits</code> argument to the function <code><a href="https://rdrr.io/r/base/format.html" class="external-link">format()</a></code></p></dd>
@@ -132,14 +94,14 @@
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p>This function provides a more human-friendly output of
-<code>result$all.hyper</code> of all the priors used for the hyperparameters.
-Since not all information about the model is encoded in this object, more
-hyperparameters than actually used, may be printed. In particular,
-<code>group.theta1</code> is printed even though the argument <code>group</code> in
-<code><a href="f.html">f()</a></code> is not used. Similarly for spde-models, but the user should know
-that, for example, only the two first ones are actually used. Hopefully,
-this issue will be fixed in the future.</p>
+    <p>This function provides a more human-friendly output of <code>result$all.hyper</code>
+of all the priors used for the hyperparameters.
+Since not all information about the model is encoded in this object, more hyperparameters
+than actually used, may be printed. In particular, <code>group.theta1</code> is printed
+even though the argument <code>group</code> in <code><a href="f.html">f()</a></code> is not used. Similarly for spde-models,
+but the user should know that, for example, only the two first ones
+are actually used.
+Hopefully, this issue will be fixed in the future.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -148,18 +110,12 @@ this issue will be fixed in the future.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">r</span> <span class="op">=</span> <span class="fu"><a href="inla.html">inla</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">r</span> <span class="op">=</span> <span class="fu"><a href="inla.html">inla</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  *** inla.core.safe:  The inla program failed, but will rerun in case better initial values may help. try=1/1 </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inla.core.safe(formula = formula, family = family, contrasts = contrasts,     data = data, quantiles = quantiles, E = E, offset = offset,     scale = scale, weights = weights, Ntrials = Ntrials, strata = strata,     lp.scale = lp.scale, link.covariates = link.covariates, verbose = verbose,     lincomb = lincomb, selection = selection, control.compute = control.compute,     control.predictor = control.predictor, control.family = control.family,     control.inla = control.inla, control.fixed = control.fixed,     control.mode = control.mode, control.expert = control.expert,     control.hazard = control.hazard, control.lincomb = control.lincomb,     control.update = control.update, control.lp.scale = control.lp.scale,     control.pardiso = control.pardiso, control.stiles = control.stiles,     control.taucs = control.taucs, control.numa = control.numa,     only.hyperparam = only.hyperparam, inla.call = inla.call,     inla.arg = inla.arg, num.threads = num.threads, keep = keep,     working.directory = working.directory, silent = silent, inla.mode = inla.mode,     safe = FALSE, debug = debug, .parent.frame = .parent.frame):</span> The inla-program exited with an error. Unless you interupted it yourself, please rerun with verbose=TRUE and check the output carefully.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inla.inlaprogram.has.crashed():</span> The inla-program exited with an error. Unless you interupted it yourself, please rerun with verbose=TRUE and check the output carefully.</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span>   If this does not help, please contact the developers at &lt;help@r-inla.org&gt;.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> The inla program failed and the maximum number of tries has been reached.</span>
 <span class="r-in"><span><span class="fu">inla.priors.used</span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'r' not found</span>
-<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

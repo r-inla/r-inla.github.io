@@ -32,12 +32,6 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/AA-group-cv.html">Cross-validation and group-cross-validation in INLA</a>
-    </li>
-    <li>
-      <a href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    </li>
-    <li>
       <a href="../articles/bGEVtutorial1-2.html">Blended GEV: a tutorial using R-INLA</a>
     </li>
     <li>
@@ -47,54 +41,24 @@
       <a href="../articles/conditional-sampling.html">Conditional sampling from a fitted model</a>
     </li>
     <li>
-      <a href="../articles/Dirichlet-CoDa.html">Fitting CoDa using the Logistic Gaussian distribution with Dirichlet covariance structure</a>
-    </li>
-    <li>
       <a href="../articles/int-design.html">User defined integration points</a>
-    </li>
-    <li>
-      <a href="../articles/jmarginal.html">Approximating joint marginals</a>
     </li>
     <li>
       <a href="../articles/multinomial.html">Multinomial logit models with INLA</a>
     </li>
     <li>
-      <a href="../articles/old-faq.html">Short tutorials from old www-page</a>
-    </li>
-    <li>
-      <a href="../articles/rgeneric.html">Defining a latent model in R or C</a>
-    </li>
-    <li>
-      <a href="../articles/sample-eval.html">The inla.posterior.sample.eval-function</a>
-    </li>
-    <li>
-      <a href="../articles/scale-model.html">Scaling IGMRF-models in R-INLA</a>
+      <a href="../articles/rgeneric.html">Defining a latent model in `R`: The `rgeneric` model</a>
     </li>
     <li>
       <a href="../articles/Old/SPDE1d.html">SPDE one dimensional example</a>
     </li>
     <li>
-      <a href="../articles/SPDE2mdatasurv.html">SPDE example with multiple kind of outcomes</a>
-    </li>
-    <li>
       <a href="../articles/Old/SPDEhowto.html">SPDE how to</a>
     </li>
     <li>
-      <a href="../articles/stack-with-factors.html">Avoiding trouble with factors in inla.stack</a>
-    </li>
-    <li>
-      <a href="../articles/svc.html">Spatially Varying Coefficient Models with R-INLA</a>
-    </li>
-    <li>
-      <a href="../articles/Tutorial_barrier_global.html">Global oceanic barrier model on the sphere</a>
-    </li>
-    <li>
-      <a href="../articles/barrier-global/Tutorial_barrier_global.html">Global oceanic barrier model on the sphere</a>
+      <a href="../articles/stack-with-factors.html">Avoiding trouble with factors in _inla.stack()_</a>
     </li>
   </ul></li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -114,53 +78,42 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">inla.coxph</span><span class="op">(</span><span class="va">formula</span>, <span class="va">data</span>, control.hazard <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">FALSE</span>, tag <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">inla.rbind.data.frames</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">inla.coxph</span><span class="op">(</span><span class="va">formula</span>, <span class="va">data</span>, control.hazard <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, tag<span class="op">=</span><span class="st">""</span>, debug<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="fu">inla.rbind.data.frames</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
+    <p></p>
 <dl><dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
-<dd><p>The formula for the coxph model where the response must be a
-<code>inla.surv</code>-object.</p></dd>
+<dd><p>The formula for the coxph model where the reponse must be a <code>inla.surv</code>-object.</p></dd>
 
+  <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>All the data used in the formula,  as a list.</p></dd>
 
-<dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>All the data used in the formula, as a list.</p></dd>
+  <dt id="arg-control-hazard">control.hazard<a class="anchor" aria-label="anchor" href="#arg-control-hazard"></a></dt>
+<dd><p>Control the model for the baseline-hazard; see <code><a href="control.hazard.html">?control.hazard</a></code>.</p></dd>
 
+  <dt id="arg-tag">tag<a class="anchor" aria-label="anchor" href="#arg-tag"></a></dt>
+<dd><p>An optional tag added to the names of the new variables created (to make them
+             unique when combined with several calls of <code>inla.coxph</code></p></dd>
 
-<dt id="arg-control-hazard">control.hazard<a class="anchor" aria-label="anchor" href="#arg-control-hazard"></a></dt>
-<dd><p>Control the model for the baseline-hazard; see
-<code><a href="control.hazard.html">?control.hazard</a></code>.</p></dd>
-
-
-<dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
+  <dt id="arg-debug">debug<a class="anchor" aria-label="anchor" href="#arg-debug"></a></dt>
 <dd><p>Print debug-information</p></dd>
 
-
-<dt id="arg-tag">tag<a class="anchor" aria-label="anchor" href="#arg-tag"></a></dt>
-<dd><p>An optional tag added to the names of the new variables created
-(to make them unique when combined with several calls of <code>inla.coxph</code>.
-Note that <code>E..coxph</code> is not included, as its usually merged into one
-vector over different expansions.</p></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Data.frames to be <code>rbind</code>-ed, padding with <code>NA</code>.</p></dd>
+  <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Data.frames to be <code>rbind</code>-ed,  padding with <code>NA</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>inla.coxph</code> returns a list of new expanded variables to be
-used in the <code>inla</code>-call.  Note that element <code>data</code> and
-<code>data.list</code> needs to be merged into a <code>list</code> to be passed as the
-<code>data</code> argument. See the example for details.</p>
-<p><code>inla.rbind.data.frames</code> returns the rbinded data.frames padded with
-NAs.  There is a better implementation in <code><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">dplyr::bind_rows</a></code>, which is
-used if package <code>dplyr</code> is installed.</p>
+    <p><code>inla.coxph</code> returns a list of new expanded variables to be used in the <code>inla</code>-call.
+      Note that element <code>data</code> and <code>data.list</code> needs to be merged into
+      a <code>list</code> to be passed as the <code>data</code> argument. See the example for details.</p>
+<p><code>inla.rbind.data.frames</code> returns the rbinded data.frames padded with NAs.
+      There is a better
+      implementation in <code><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">dplyr::bind_rows</a></code>, which is used if package <code>dplyr</code> is
+      installed.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -169,8 +122,7 @@ used if package <code>dplyr</code> is installed.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## How the cbind.data.frames works:</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## How the cbind.data.frames works:</span></span></span>
 <span class="r-in"><span><span class="va">df1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, y<span class="op">=</span><span class="fl">2</span><span class="op">:</span><span class="fl">3</span>, z<span class="op">=</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x<span class="op">=</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span>, yy<span class="op">=</span><span class="fl">4</span><span class="op">:</span><span class="fl">5</span>, zz<span class="op">=</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">inla.rbind.data.frames</span><span class="op">(</span><span class="va">df1</span>, <span class="va">df2</span><span class="op">)</span></span></span>
@@ -187,22 +139,16 @@ used if package <code>dplyr</code> is installed.</p>
 <span class="r-in"><span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span><span class="va">n</span>, rate<span class="op">=</span><span class="va">lambda</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">event</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">y</span>, event<span class="op">=</span><span class="va">event</span>, x<span class="op">=</span><span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">y.surv</span> <span class="op">=</span> <span class="fu"><a href="surv.html">inla.surv</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">event</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y.surv</span> <span class="op">=</span> <span class="fu">inla.surv</span><span class="op">(</span><span class="va">y</span>, <span class="va">event</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">intercept1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">p</span> <span class="op">=</span> <span class="fu">inla.coxph</span><span class="op">(</span><span class="va">y.surv</span> <span class="op">~</span> <span class="op">-</span><span class="fl">1</span> <span class="op">+</span> <span class="va">intercept1</span> <span class="op">+</span> <span class="va">x</span>,</span></span>
 <span class="r-in"><span>               <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>y.surv <span class="op">=</span> <span class="va">y.surv</span>,  x<span class="op">=</span><span class="va">x</span>, intercept1 <span class="op">=</span> <span class="va">intercept1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">r</span> <span class="op">=</span> <span class="fu"><a href="inla.html">inla</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">formula</span>,</span></span>
-<span class="r-in"><span>        family <span class="op">=</span> <span class="va">p</span><span class="op">$</span><span class="va">family</span>,</span></span>
-<span class="r-in"><span>        data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">data</span><span class="op">)</span>, <span class="va">p</span><span class="op">$</span><span class="va">data.list</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="va">r</span> <span class="op">=</span> <span class="fu"><a href="inla.html">inla</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">formula</span>, </span></span>
+<span class="r-in"><span>        family <span class="op">=</span> <span class="va">p</span><span class="op">$</span><span class="va">family</span>, </span></span>
+<span class="r-in"><span>        data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">data</span><span class="op">)</span>, <span class="va">p</span><span class="op">$</span><span class="va">data.list</span><span class="op">)</span>, </span></span>
 <span class="r-in"><span>        E <span class="op">=</span> <span class="va">p</span><span class="op">$</span><span class="va">E</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  *** inla.core.safe:  The inla program failed, but will rerun in case better initial values may help. try=1/1 </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inla.core.safe(formula = formula, family = family, contrasts = contrasts,     data = data, quantiles = quantiles, E = E, offset = offset,     scale = scale, weights = weights, Ntrials = Ntrials, strata = strata,     lp.scale = lp.scale, link.covariates = link.covariates, verbose = verbose,     lincomb = lincomb, selection = selection, control.compute = control.compute,     control.predictor = control.predictor, control.family = control.family,     control.inla = control.inla, control.fixed = control.fixed,     control.mode = control.mode, control.expert = control.expert,     control.hazard = control.hazard, control.lincomb = control.lincomb,     control.update = control.update, control.lp.scale = control.lp.scale,     control.pardiso = control.pardiso, control.stiles = control.stiles,     control.taucs = control.taucs, control.numa = control.numa,     only.hyperparam = only.hyperparam, inla.call = inla.call,     inla.arg = inla.arg, num.threads = num.threads, keep = keep,     working.directory = working.directory, silent = silent, inla.mode = inla.mode,     safe = FALSE, debug = debug, .parent.frame = .parent.frame):</span> The inla-program exited with an error. Unless you interupted it yourself, please rerun with verbose=TRUE and check the output carefully.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   If this does not help, please contact the developers at &lt;help@r-inla.org&gt;.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> The inla program failed and the maximum number of tries has been reached.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in !is.null(h) &amp;&amp; !is.null(h[[key]]) &amp;&amp; !(is.na(h[[key]])):</span> 'length = 2' in coercion to 'logical(1)'</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'object' in selecting a method for function 'summary': object 'r' not found</span>
 <span class="r-in"><span></span></span>
@@ -224,47 +170,7 @@ used if package <code>dplyr</code> is installed.</p>
 <span class="r-in"><span>        family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">family</span>, <span class="st">"gaussian"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        data <span class="op">=</span> <span class="va">df.joint</span>,</span></span>
 <span class="r-in"><span>        E <span class="op">=</span> <span class="va">df.joint</span><span class="op">$</span><span class="va">E..coxph</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  *** inla.core.safe:  The inla program failed, but will rerun in case better initial values may help. try=1/1 </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inla.core.safe(formula = formula, family = family, contrasts = contrasts,     data = data, quantiles = quantiles, E = E, offset = offset,     scale = scale, weights = weights, Ntrials = Ntrials, strata = strata,     lp.scale = lp.scale, link.covariates = link.covariates, verbose = verbose,     lincomb = lincomb, selection = selection, control.compute = control.compute,     control.predictor = control.predictor, control.family = control.family,     control.inla = control.inla, control.fixed = control.fixed,     control.mode = control.mode, control.expert = control.expert,     control.hazard = control.hazard, control.lincomb = control.lincomb,     control.update = control.update, control.lp.scale = control.lp.scale,     control.pardiso = control.pardiso, control.stiles = control.stiles,     control.taucs = control.taucs, control.numa = control.numa,     only.hyperparam = only.hyperparam, inla.call = inla.call,     inla.arg = inla.arg, num.threads = num.threads, keep = keep,     working.directory = working.directory, silent = silent, inla.mode = inla.mode,     safe = FALSE, debug = debug, .parent.frame = .parent.frame):</span> The inla-program exited with an error. Unless you interupted it yourself, please rerun with verbose=TRUE and check the output carefully.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   If this does not help, please contact the developers at &lt;help@r-inla.org&gt;.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> The inla program failed and the maximum number of tries has been reached.</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## A check that automatic and manual approach gives the same result</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Leuk</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">## add some random stuff for testing. Note that variables needs to</span></span></span>
-<span class="r-in"><span><span class="co">## be in 'data' as they are expanded</span></span></span>
-<span class="r-in"><span><span class="va">Leuk</span><span class="op">$</span><span class="va">off</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Leuk</span><span class="op">)</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, max <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">Leuk</span><span class="op">$</span><span class="va">off.form</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Leuk</span><span class="op">)</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, max <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">Leuk</span><span class="op">$</span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Leuk</span><span class="op">)</span>, min <span class="op">=</span> <span class="fl">0.5</span>, max <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="surv.html">inla.surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">cens</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>    <span class="va">wbc</span> <span class="op">+</span> <span class="va">tpi</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="va">off.form</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="inla.html">inla</a></span><span class="op">(</span><span class="va">formula</span>, family <span class="op">=</span> <span class="st">"coxph"</span>, data <span class="op">=</span> <span class="va">Leuk</span>,</span></span>
-<span class="r-in"><span>          offset <span class="op">=</span> <span class="va">off</span>, weights <span class="op">=</span> <span class="va">w</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  *** inla.core.safe:  The inla program failed, but will rerun in case better initial values may help. try=1/1 </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inla.core.safe(formula = formula, family = family, contrasts = contrasts,     data = data, quantiles = quantiles, E = E, offset = offset,     scale = scale, weights = weights, Ntrials = Ntrials, strata = strata,     lp.scale = lp.scale, link.covariates = link.covariates, verbose = verbose,     lincomb = lincomb, selection = selection, control.compute = control.compute,     control.predictor = control.predictor, control.family = control.family,     control.inla = control.inla, control.fixed = control.fixed,     control.mode = control.mode, control.expert = control.expert,     control.hazard = control.hazard, control.lincomb = control.lincomb,     control.update = control.update, control.lp.scale = control.lp.scale,     control.pardiso = control.pardiso, control.stiles = control.stiles,     control.taucs = control.taucs, control.numa = control.numa,     only.hyperparam = only.hyperparam, inla.call = inla.call,     inla.arg = inla.arg, num.threads = num.threads, keep = keep,     working.directory = working.directory, silent = silent, inla.mode = inla.mode,     safe = FALSE, debug = debug, .parent.frame = .parent.frame):</span> The inla-program exited with an error. Unless you interupted it yourself, please rerun with verbose=TRUE and check the output carefully.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   If this does not help, please contact the developers at &lt;help@r-inla.org&gt;.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> The inla program failed and the maximum number of tries has been reached.</span>
-<span class="r-in"><span><span class="va">cph</span> <span class="op">&lt;-</span> <span class="fu">inla.coxph</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">formula</span>, data <span class="op">=</span> <span class="va">Leuk</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">cph.data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">cph</span><span class="op">$</span><span class="va">data</span><span class="op">)</span>, <span class="va">cph</span><span class="op">$</span><span class="va">data.list</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="inla.html">inla</a></span><span class="op">(</span><span class="va">cph</span><span class="op">$</span><span class="va">formula</span>, family <span class="op">=</span> <span class="va">cph</span><span class="op">$</span><span class="va">family</span>,  data <span class="op">=</span> <span class="va">cph.data</span>, </span></span>
-<span class="r-in"><span>           E <span class="op">=</span> <span class="va">cph</span><span class="op">$</span><span class="va">E</span>, offset <span class="op">=</span> <span class="va">off</span>, weights <span class="op">=</span> <span class="va">w</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  *** inla.core.safe:  The inla program failed, but will rerun in case better initial values may help. try=1/1 </span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>error in running command</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inla.core.safe(formula = formula, family = family, contrasts = contrasts,     data = data, quantiles = quantiles, E = E, offset = offset,     scale = scale, weights = weights, Ntrials = Ntrials, strata = strata,     lp.scale = lp.scale, link.covariates = link.covariates, verbose = verbose,     lincomb = lincomb, selection = selection, control.compute = control.compute,     control.predictor = control.predictor, control.family = control.family,     control.inla = control.inla, control.fixed = control.fixed,     control.mode = control.mode, control.expert = control.expert,     control.hazard = control.hazard, control.lincomb = control.lincomb,     control.update = control.update, control.lp.scale = control.lp.scale,     control.pardiso = control.pardiso, control.stiles = control.stiles,     control.taucs = control.taucs, control.numa = control.numa,     only.hyperparam = only.hyperparam, inla.call = inla.call,     inla.arg = inla.arg, num.threads = num.threads, keep = keep,     working.directory = working.directory, silent = silent, inla.mode = inla.mode,     safe = FALSE, debug = debug, .parent.frame = .parent.frame):</span> The inla-program exited with an error. Unless you interupted it yourself, please rerun with verbose=TRUE and check the output carefully.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>   If this does not help, please contact the developers at &lt;help@r-inla.org&gt;.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> The inla program failed and the maximum number of tries has been reached.</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">mlik</span>, <span class="va">rr</span><span class="op">$</span><span class="va">mlik</span>, <span class="va">r</span><span class="op">$</span><span class="va">mlik</span> <span class="op">-</span> <span class="va">rr</span><span class="op">$</span><span class="va">mlik</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'print': object 'r' not found</span>
-<span class="r-in"><span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in !is.null(h) &amp;&amp; !is.null(h[[key]]) &amp;&amp; !(is.na(h[[key]])):</span> 'length = 2' in coercion to 'logical(1)'</span>
 </code></pre></div>
     </div>
   </div>

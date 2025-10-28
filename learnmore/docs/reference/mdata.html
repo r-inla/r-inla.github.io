@@ -32,12 +32,6 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/AA-group-cv.html">Cross-validation and group-cross-validation in INLA</a>
-    </li>
-    <li>
-      <a href="../articles/Apptainer.html">Installation of INLA and inlabru with Apptainer on HPC</a>
-    </li>
-    <li>
       <a href="../articles/bGEVtutorial1-2.html">Blended GEV: a tutorial using R-INLA</a>
     </li>
     <li>
@@ -47,54 +41,24 @@
       <a href="../articles/conditional-sampling.html">Conditional sampling from a fitted model</a>
     </li>
     <li>
-      <a href="../articles/Dirichlet-CoDa.html">Fitting CoDa using the Logistic Gaussian distribution with Dirichlet covariance structure</a>
-    </li>
-    <li>
       <a href="../articles/int-design.html">User defined integration points</a>
-    </li>
-    <li>
-      <a href="../articles/jmarginal.html">Approximating joint marginals</a>
     </li>
     <li>
       <a href="../articles/multinomial.html">Multinomial logit models with INLA</a>
     </li>
     <li>
-      <a href="../articles/old-faq.html">Short tutorials from old www-page</a>
-    </li>
-    <li>
-      <a href="../articles/rgeneric.html">Defining a latent model in R or C</a>
-    </li>
-    <li>
-      <a href="../articles/sample-eval.html">The inla.posterior.sample.eval-function</a>
-    </li>
-    <li>
-      <a href="../articles/scale-model.html">Scaling IGMRF-models in R-INLA</a>
+      <a href="../articles/rgeneric.html">Defining a latent model in `R`: The `rgeneric` model</a>
     </li>
     <li>
       <a href="../articles/Old/SPDE1d.html">SPDE one dimensional example</a>
     </li>
     <li>
-      <a href="../articles/SPDE2mdatasurv.html">SPDE example with multiple kind of outcomes</a>
-    </li>
-    <li>
       <a href="../articles/Old/SPDEhowto.html">SPDE how to</a>
     </li>
     <li>
-      <a href="../articles/stack-with-factors.html">Avoiding trouble with factors in inla.stack</a>
-    </li>
-    <li>
-      <a href="../articles/svc.html">Spatially Varying Coefficient Models with R-INLA</a>
-    </li>
-    <li>
-      <a href="../articles/Tutorial_barrier_global.html">Global oceanic barrier model on the sphere</a>
-    </li>
-    <li>
-      <a href="../articles/barrier-global/Tutorial_barrier_global.html">Global oceanic barrier model on the sphere</a>
+      <a href="../articles/stack-with-factors.html">Avoiding trouble with factors in _inla.stack()_</a>
     </li>
   </ul></li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -115,55 +79,40 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">inla.mdata</span><span class="op">(</span><span class="va">y</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S3 method for class 'inla.mdata'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">as.inla.mdata</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">is.inla.mdata</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">is.inla.mdata</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
+<span><span class="fu">as.inla.mdata</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-
-
+    <p></p>
 <dl><dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>The response vector/matrix</p></dd>
 
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+  <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional vectors/matrics of same length as <code>y</code></p></dd>
 
-
-<dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>An mdata object</p></dd>
-
-
-<dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
+  <dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>Any <code>R</code>-object</p></dd>
 
-</dl></div>
+  <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>An mdata object</p></dd>
+
+  </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of class <code>inla.mdata</code>.  There is method for
-<code>print</code>.</p>
-<p><code>is.inla.mdata</code> returns <code>TRUE</code> if <code>object</code> inherits from
-class <code>inla.mdata</code>, otherwise <code>FALSE</code>.</p>
+    <p>An object of class <code>inla.mdata</code>.  There is method for <code>print</code>.</p>
+<p><code>is.inla.mdata</code> returns <code>TRUE</code> if <code>object</code>
+     inherits from class <code>inla.mdata</code>, otherwise <code>FALSE</code>.</p>
 <p><code>as.inla.mdata</code> returns an object of class <code>inla.mdata</code></p>
-    </div>
-    <div id="note">
-    <h2>Note</h2>
-    <p>It is often required to set <code>Y=inla.mdata(...)</code> and then define
-the formula as <code>Y~...</code>, especially when used with <code>inla.stack</code>.</p>
-    </div>
-    <div id="see-also">
-    <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="inla.html">inla()</a></code></p></div>
     </div>
     <div id="author">
     <h2>Author</h2>
     <p>Havard Rue</p>
+    </div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p><code><a href="inla.html">inla</a></code></p></div>
     </div>
 
   </div>
