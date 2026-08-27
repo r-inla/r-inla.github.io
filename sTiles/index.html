@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sTiles – INLA Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .code-block {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      line-height: 1.55;
+      white-space: pre;
+      margin: 1em 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="team-header">
+    <h1>sTiles</h1>
+    <p>A high performance sparse Cholesky backend for INLA</p>
+  </header>
+
+  <section class="content-section">
+    <h2>What is sTiles?</h2>
+    <p>
+      <strong>sTiles</strong> is a high performance framework for the Cholesky factorization of
+      large sparse symmetric positive definite matrices, developed at KAUST. It tiles the matrix
+      and schedules the factorization over the tiles, which lets it exploit the
+      <em>semisparse</em> structure (sparse blocks combined with dense blocks) that is typical of
+      the precision matrices of latent Gaussian Markov random fields, exactly the matrices INLA
+      factorizes in its inner loop.
+    </p>
+    <p>
+      Inside INLA, sTiles is available as an alternative sparse matrix backend. The model
+      specification, the calls and the results are unchanged; only the numerical engine that
+      factorizes the precision matrices is different. On structured models (spatial,
+      spatio-temporal, survival and genetics applications among others) this can reduce the
+      factorization time substantially, in particular on machines with many cores.
+    </p>
+    <p class="resource-links">
+      <a href="https://esmail-abdulfattah.github.io/sTiles/" target="_blank">🔗 The sTiles project website</a>
+    </p>
+  </section>
+
+  <section class="content-section">
+    <h2>Using sTiles with INLA</h2>
+    <p>
+      Recent INLA testing builds ship with the sTiles backend included. The easiest way to set
+      everything up is the installer helper, which downloads an INLA binary paired with a
+      matching sTiles library for your platform and selects it for the current session:
+    </p>
+    <div class="code-block">library(INLA)
+inla.stiles.install()</div>
+    <p>
+      The helper prints the two <code>inla.setOption()</code> lines it applied; put them in your
+      <code>~/.Rprofile</code> to make the selection permanent. To select the backend by hand in
+      a build that already includes sTiles:
+    </p>
+    <div class="code-block">inla.setOption(smtp = "stiles")</div>
+    <p>
+      You can check what is currently active, and whether the installed binary responds, with:
+    </p>
+    <div class="code-block">inla.stiles.status()</div>
+  </section>
+
+  <section class="content-section">
+    <h2>Choosing the tile type: sparse, semisparse or dense</h2>
+    <p>
+      sTiles stores the factor as a grid of tiles, and each matrix is handled in one of three
+      tile storage modes. The mode is set per model through <code>control.stiles</code>:
+    </p>
+    <div class="code-block">result &lt;- inla(formula, data = data,
+              control.stiles = list(tile.type = "auto"))</div>
+    <p>
+      Valid values for <code>tile.type</code> are <code>"default"</code>, <code>"auto"</code>,
+      <code>"sparse"</code>, <code>"semisparse"</code> and <code>"dense"</code>. With
+      <code>"auto"</code>, sTiles inspects the precision matrix (its fill ratio, tile occupancy
+      and degree structure) and picks the mode by heuristics; this is the recommended setting,
+      and the explicit values are there for experimentation. The typical sparsity patterns the
+      three modes target look like this:
+    </p>
+
+    <div style="display:flex; flex-wrap:wrap; gap:28px; justify-content:center; margin:1.4em 0;">
+      <figure style="margin:0; text-align:center;">
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="sparse matrix pattern">
+          <rect x="0" y="0" width="150" height="150" fill="#ffffff" stroke="#8a97a8"/>
+          <line x1="0" y1="0" x2="150" y2="150" stroke="#2f4f7a" stroke-width="3"/>
+          <g fill="#2f4f7a">
+            <circle cx="34" cy="9" r="2"/><circle cx="9" cy="34" r="2"/>
+            <circle cx="61" cy="17" r="2"/><circle cx="17" cy="61" r="2"/>
+            <circle cx="96" cy="24" r="2"/><circle cx="24" cy="96" r="2"/>
+            <circle cx="139" cy="31" r="2"/><circle cx="31" cy="139" r="2"/>
+            <circle cx="72" cy="44" r="2"/><circle cx="44" cy="72" r="2"/>
+            <circle cx="118" cy="52" r="2"/><circle cx="52" cy="118" r="2"/>
+            <circle cx="89" cy="66" r="2"/><circle cx="66" cy="89" r="2"/>
+            <circle cx="133" cy="78" r="2"/><circle cx="78" cy="133" r="2"/>
+            <circle cx="109" cy="93" r="2"/><circle cx="93" cy="109" r="2"/>
+            <circle cx="142" cy="104" r="2"/><circle cx="104" cy="142" r="2"/>
+            <circle cx="126" cy="115" r="2"/><circle cx="115" cy="126" r="2"/>
+            <circle cx="47" cy="12" r="2"/><circle cx="12" cy="47" r="2"/>
+            <circle cx="83" cy="37" r="2"/><circle cx="37" cy="83" r="2"/>
+            <circle cx="121" cy="19" r="2"/><circle cx="19" cy="121" r="2"/>
+          </g>
+        </svg>
+        <figcaption style="font-size:0.85em; margin-top:6px;"><strong>sparse</strong><br>
+          few nonzeros, irregular pattern</figcaption>
+      </figure>
+
+      <figure style="margin:0; text-align:center;">
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="semisparse matrix pattern">
+          <rect x="0" y="0" width="150" height="150" fill="#ffffff" stroke="#8a97a8"/>
+          <line x1="0" y1="0" x2="122" y2="122" stroke="#2f4f7a" stroke-width="4"/>
+          <line x1="18" y1="0" x2="122" y2="104" stroke="#2f4f7a" stroke-width="2" opacity="0.75"/>
+          <line x1="0" y1="18" x2="104" y2="122" stroke="#2f4f7a" stroke-width="2" opacity="0.75"/>
+          <line x1="46" y1="0" x2="122" y2="76" stroke="#2f4f7a" stroke-width="2" opacity="0.55"/>
+          <line x1="0" y1="46" x2="76" y2="122" stroke="#2f4f7a" stroke-width="2" opacity="0.55"/>
+          <rect x="122" y="0" width="28" height="150" fill="#2f4f7a"/>
+          <rect x="0" y="122" width="150" height="28" fill="#2f4f7a"/>
+        </svg>
+        <figcaption style="font-size:0.85em; margin-top:6px;"><strong>semisparse</strong><br>
+          sparse body with dense rows and columns</figcaption>
+      </figure>
+
+      <figure style="margin:0; text-align:center;">
+        <svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="dense matrix pattern">
+          <rect x="0" y="0" width="150" height="150" fill="#2f4f7a" stroke="#8a97a8"/>
+        </svg>
+        <figcaption style="font-size:0.85em; margin-top:6px;"><strong>dense</strong><br>
+          nearly all entries nonzero</figcaption>
+      </figure>
+    </div>
+
+    <p>
+      As a rule of thumb: <strong>sparse</strong> wins on very sparse irregular problems where
+      most tiles never fill in, <strong>semisparse</strong> wins on the structured latent GMRF
+      precision matrices INLA typically produces (spatial and spatio-temporal models with fixed
+      effects), and <strong>dense</strong> wins when the reordered factor fills almost
+      completely, as in genetics models with dense relationship matrices. When in doubt, leave
+      <code>tile.type = "auto"</code> and let the heuristics decide per matrix.
+    </p>
+    <p>
+      The dense mode also removes a classical restriction: the precision matrix does not have
+      to be sparse at all. If it fits in memory, sTiles factorizes it as a tiled dense matrix
+      with BLAS level 3 kernels, so models with fully dense precision matrices can be run
+      through INLA when enough memory is available.
+    </p>
+    <p>
+      Setting <code>verbose = TRUE</code> in <code>control.stiles</code> prints what sTiles
+      decided, which is useful when comparing modes on your own model.
+    </p>
+  </section>
+
+  <section class="content-section">
+    <h2>Notes</h2>
+    <p>
+      Every INLA build that includes sTiles is paired with a specific sTiles release, built with
+      the same compiler and CPU target; the pairing is recorded in the build information shipped
+      with the binaries. The <code>inla.stiles.install()</code> helper always fetches a matching
+      pair, so no manual version bookkeeping is needed.
+    </p>
+  </section>
+
+  <section class="content-section">
+    <h2>Citing sTiles</h2>
+    <p>
+      If you use the sTiles backend in your work, please cite:
+    </p>
+    <div id="stiles-cite-tabs" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+      <button type="button" data-fmt="bibtex" class="cite-tab">BibTeX</button>
+      <button type="button" data-fmt="apa" class="cite-tab">APA</button>
+      <button type="button" data-fmt="mla" class="cite-tab">MLA</button>
+      <button type="button" data-fmt="chicago" class="cite-tab">Chicago</button>
+      <button type="button" data-fmt="harvard" class="cite-tab">Harvard</button>
+    </div>
+    <div style="position:relative;">
+      <button id="stiles-cite-copy" type="button"
+        style="position:absolute; top:8px; right:8px; font-size:0.8em; padding:4px 10px;
+               border:1px solid #c6d0de; border-radius:5px; background:#ffffff; cursor:pointer;">
+        Copy</button>
+      <div class="code-block" id="stiles-cite-text" style="white-space:pre-wrap;"></div>
+    </div>
+    <style>
+      .cite-tab {
+        font-size: 0.85em;
+        padding: 5px 14px;
+        border: 1px solid #c6d0de;
+        border-radius: 5px;
+        background: #ffffff;
+        cursor: pointer;
+      }
+      .cite-tab.active {
+        background: #2f4f7a;
+        border-color: #2f4f7a;
+        color: #ffffff;
+      }
+    </style>
+    <script>
+      (function () {
+        var formats = {
+          bibtex: '@inproceedings{fattah2025stiles,\n' +
+            '  title     = {{sTiles}: An Accelerated Computational\n' +
+            '               Framework for Sparse Factorizations\n' +
+            '               of Structured Matrices},\n' +
+            '  author    = {Abdul Fattah, Esmail and Ltaief, Hatem\n' +
+            '               and Rue, H{\\aa}vard and Keyes, David},\n' +
+            '  booktitle = {ISC High Performance 2025 Research Paper\n' +
+            '               Proceedings (40th International Conference)},\n' +
+            '  pages     = {1--14},\n' +
+            '  year      = {2025},\n' +
+            '  organization = {Prometeus GmbH}\n' +
+            '}',
+          apa: 'Abdul Fattah, E., Ltaief, H., Rue, H., & Keyes, D. (2025). sTiles: An accelerated ' +
+            'computational framework for sparse factorizations of structured matrices. In ISC High ' +
+            'Performance 2025 Research Paper Proceedings (40th International Conference) (pp. 1-14). ' +
+            'Prometeus GmbH.',
+          mla: 'Abdul Fattah, Esmail, et al. "sTiles: An Accelerated Computational Framework for ' +
+            'Sparse Factorizations of Structured Matrices." ISC High Performance 2025 Research Paper ' +
+            'Proceedings (40th International Conference), Prometeus GmbH, 2025, pp. 1-14.',
+          chicago: 'Abdul Fattah, Esmail, Hatem Ltaief, Håvard Rue, and David Keyes. 2025. ' +
+            '"sTiles: An Accelerated Computational Framework for Sparse Factorizations of Structured ' +
+            'Matrices." In ISC High Performance 2025 Research Paper Proceedings (40th International ' +
+            'Conference), 1-14. Prometeus GmbH.',
+          harvard: 'Abdul Fattah, E., Ltaief, H., Rue, H. and Keyes, D., 2025. sTiles: An accelerated ' +
+            'computational framework for sparse factorizations of structured matrices. In ISC High ' +
+            'Performance 2025 Research Paper Proceedings (40th International Conference) (pp. 1-14). ' +
+            'Prometeus GmbH.'
+        };
+        var box = document.getElementById('stiles-cite-text');
+        var tabs = document.querySelectorAll('#stiles-cite-tabs .cite-tab');
+        function select(fmt) {
+          box.textContent = formats[fmt];
+          tabs.forEach(function (t) {
+            t.classList.toggle('active', t.getAttribute('data-fmt') === fmt);
+          });
+        }
+        tabs.forEach(function (t) {
+          t.addEventListener('click', function () { select(t.getAttribute('data-fmt')); });
+        });
+        select('bibtex');
+
+        var btn = document.getElementById('stiles-cite-copy');
+        btn.addEventListener('click', function () {
+          var text = box.textContent;
+          function done() {
+            btn.textContent = 'Copied';
+            setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done);
+          } else {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            done();
+          }
+        });
+      })();
+    </script>
+  </section>
+
+  <script>
+    (function () {
+      if (window.__inlaNavLoader) {
+        return;
+      }
+      window.__inlaNavLoader = true;
+      var path = window.location.pathname;
+      var segments = path.split('/').filter(Boolean);
+      var depth = segments.length;
+      if (depth && segments[depth - 1].indexOf('.') !== -1) {
+        depth -= 1;
+      }
+      var prefix = depth > 0 ? '../'.repeat(depth) : '';
+      var script = document.createElement('script');
+      script.src = prefix + 'nav.js';
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

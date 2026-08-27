@@ -20,6 +20,7 @@
       label: 'Use INLA',
       children: [
         { label: 'Download & Install', path: 'download/index.html' },
+        { label: 'sTiles Solver', path: 'sTiles/index.html' },
         { label: 'Examples & Tutorials', path: 'examples/index.html' },
         { label: 'Support & Issues', path: 'issues/index.html' }
       ]
