@@ -493,18 +493,44 @@ nav a:hover {
   transform: translate3d(-100%, -34px, 70px);
 }
 
-/* no hover or too narrow for the 3D shelf: covers face out in a swipeable row */
-@media (hover: none), (max-width: 1120px) {
-  .bookshelf {
+/* bookshelf.js scales the 3D shelf to fit and stacks extra shelves below */
+.bookshelf-fit {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.bookshelf-scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.bookshelf.is-3d {
+  margin-bottom: 0;
+}
+
+.bookshelf.is-3d + .bookshelf.is-3d {
+  border-top-width: 0;
+  border-radius: 0;
+}
+
+.bookshelf.is-3d .bookshelf__row {
+  justify-content: center;
+}
+
+/* without the script, narrow screens get covers in a swipeable row */
+@media (max-width: 1120px) {
+  .bookshelf:not(.is-3d) {
     padding-top: 26px;
     perspective: none;
   }
 
-  .bookshelf__floor {
+  .bookshelf:not(.is-3d) .bookshelf__floor {
     display: none;
   }
 
-  .bookshelf__row {
+  .bookshelf:not(.is-3d) .bookshelf__row {
     gap: 18px;
     min-height: 0;
     padding: 0 6px 0 2px;
@@ -513,21 +539,21 @@ nav a:hover {
     -webkit-overflow-scrolling: touch;
   }
 
-  .book__spine,
-  .book__top,
-  .book__back,
-  .book__body::after {
+  .bookshelf:not(.is-3d) .book__spine,
+  .bookshelf:not(.is-3d) .book__top,
+  .bookshelf:not(.is-3d) .book__back,
+  .bookshelf:not(.is-3d) .book__body::after {
     display: none;
   }
 
-  .book-stack {
+  .bookshelf:not(.is-3d) .book-stack {
     display: contents;
   }
 
-  .book,
-  .book--lean,
-  .book--flat,
-  .book--flat:first-child {
+  .bookshelf:not(.is-3d) .book,
+  .bookshelf:not(.is-3d) .book--lean,
+  .bookshelf:not(.is-3d) .book--flat,
+  .bookshelf:not(.is-3d) .book--flat:first-child {
     flex: 0 0 auto;
     width: auto;
     height: auto;
@@ -536,15 +562,15 @@ nav a:hover {
     scroll-snap-align: start;
   }
 
-  .book__body,
-  .book--flat .book__body {
+  .bookshelf:not(.is-3d) .book__body,
+  .bookshelf:not(.is-3d) .book--flat .book__body {
     position: static;
     display: contents;
   }
 
   /* page block showing past the cover */
-  .book .book__cover,
-  .book--flat > .book__cover {
+  .bookshelf:not(.is-3d) .book .book__cover,
+  .bookshelf:not(.is-3d) .book--flat > .book__cover {
     position: static;
     width: auto;
     height: 210px;
